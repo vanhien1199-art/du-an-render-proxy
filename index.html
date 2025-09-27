@@ -1,57 +1,15 @@
-<script>
-    // ... (các hàm calculateSpeed, quizForm vẫn giữ nguyên) ...
-
-    const chatWindow = document.getElementById('chat-window');
-    const userInput = document.getElementById('user-input');
-
-    // Dòng này sẽ được cập nhật ở bước cuối
-    const AI_SERVICE_URL = "https://du-an-render-proxy.onrender.com";
-
-    async function askAI() {
-        const question = userInput.value.trim();
-        if (!question) return;
-
-        addMessageToChat(question, 'user-message');
-        userInput.value = '';
-        const waitingMessage = addMessageToChat('Trợ lý AI đang suy nghĩ...', 'ai-message');
-
-        try {
-            const response = await fetch(`${AI_SERVICE_URL}/ask`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question: question })
-            });
-
-            if (!response.ok) {
-              if (!response.ok) {
-  const contentType = response.headers.get("content-type");
-  let errorMessage = 'Lỗi không xác định';
-
-  if (contentType && contentType.includes("application/json")) {
-    const errorData = await response.json();
-    errorMessage = errorData.error || errorMessage;
-  } else {
-    const errorText = await response.text();
-    errorMessage = errorText || errorMessage;
-  }
-
-  throw new Error(errorMessage);
-}
-            const data = await response.json();
-            waitingMessage.innerHTML = data.answer.replace(/\n/g, '<br>');
-
-        } catch (error) {
-            console.error("Lỗi:", error);
-            waitingMessage.textContent = `Xin lỗi, đã có lỗi: ${error.message}`;
-        }
-    }
-
-    function addMessageToChat(text, className) {
-        // ... (hàm này giữ nguyên không đổi) ...
-    }
-
-</script>
-
-
-
-
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang Web Kiểm Thử</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; }
+        h1 { color: #007bff; }
+    </style>
+</head>
+<body>
+    <h1>Xin chào! Trang web đang hoạt động.</h1>
+    <p>Nếu bạn thấy dòng chữ này, có nghĩa là Render đã triển khai thành công.</p>
+</body>
+</html>
