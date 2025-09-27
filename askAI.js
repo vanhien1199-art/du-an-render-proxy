@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const fetch = require('node-fetch'); // THÊM DÒNG NÀY
+const fetch = require('node-fetch');
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -19,11 +19,13 @@ app.post('/ask', async (req, res) => {
     if (!question) {
         return res.status(400).json({ error: 'Thiếu câu hỏi.' });
     }
+
+    // *** PHIÊN BẢN URL CHUẨN DỰA TRÊN KẾT QUẢ LISTMODELS ***
     const GOOGLE_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-      const prompt = `Bạn là một trợ giảng AI, chỉ trả lời các câu hỏi liên quan đến bài học "Đo tốc độ" dành cho học sinh lớp 7 một cách ngắn gọn, dễ hiểu. Nếu câu hỏi không liên quan, hãy trả lời rằng "Câu hỏi này nằm ngoài phạm vi bài học Đo tốc độ, bạn có câu hỏi nào khác không?". Câu hỏi của học sinh là: "${question}"`;
+    
+    const prompt = `Bạn là một trợ giảng AI, chỉ trả lời các câu hỏi liên quan đến bài học "Đo tốc độ" dành cho học sinh lớp 7 một cách ngắn gọn, dễ hiểu. Nếu câu hỏi không liên quan, hãy trả lời rằng "Câu hỏi này nằm ngoài phạm vi bài học Đo tốc độ, bạn có câu hỏi nào khác không?". Câu hỏi của học sinh là: "${question}"`;
 
     try {
-        // DÒNG "import('node-fetch')" ĐÃ BỊ XÓA VÀ THAY BẰNG DÒNG "require" Ở TRÊN
         const googleResponse = await fetch(GOOGLE_API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -57,5 +59,3 @@ app.post('/ask', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-
-
