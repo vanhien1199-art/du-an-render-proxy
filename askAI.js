@@ -20,8 +20,8 @@ app.post('/ask', async (req, res) => {
         return res.status(400).json({ error: 'Thiếu câu hỏi.' });
     }
 
-    // *** PHIÊN BẢN URL CHUẨN DỰA TRÊN KẾT QUẢ LISTMODELS ***
-    const GOOGLE_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // *** SỬ DỤNG MODEL ĐÃ ĐƯỢC XÁC NHẬN HOẠT ĐỘNG ***
+    const GOOGLE_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
     
     const prompt = `Bạn là một trợ giảng AI, chỉ trả lời các câu hỏi liên quan đến bài học "Đo tốc độ" dành cho học sinh lớp 7 một cách ngắn gọn, dễ hiểu. Nếu câu hỏi không liên quan, hãy trả lời rằng "Câu hỏi này nằm ngoài phạm vi bài học Đo tốc độ, bạn có câu hỏi nào khác không?". Câu hỏi của học sinh là: "${question}"`;
 
