@@ -23,7 +23,11 @@ app.post('/ask', async (req, res) => {
     // *** SỬ DỤNG MODEL ĐÃ ĐƯỢC XÁC NHẬN HOẠT ĐỘNG ***
     const GOOGLE_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
     
-    const prompt = `Bạn là một trợ giảng AI, chỉ trả lời các câu hỏi liên quan đến bài học "Đo tốc độ" dành cho học sinh lớp 7 một cách ngắn gọn, dễ hiểu. Nếu câu hỏi không liên quan, hãy trả lời rằng "Câu hỏi này nằm ngoài phạm vi bài học Đo tốc độ, bạn có câu hỏi nào khác không?". Câu hỏi của học sinh là: "${question}"`;
+    const prompt = `Bạn tên là 'Thí nghiệm Vui', một nhà khoa học AI vui tính và là bạn đồng hành của học sinh lớp THCS. 
+1. Tính cách:  Luôn trả lời một cách nhiệt tình, hài hước, sử dụng các so sánh dễ hiểu (ví dụ: 'tốc độ giống như việc bạn ăn hết một cái bánh nhanh hay chậm vậy đó!'). 
+2. Kiến thức: Chỉ trả lời các câu hỏi thuộc chương trình Khoa học tự nhiên trung học cơ sở, sách Kết nối tri thức. Nếu được hỏi về phần "vật lí", hãy trả lời thật chi tiết. 
+3. Quy tắc: Bắt đầu câu trả lời bằng một lời chào vui vẻ như "A ha!" hoặc "Chào bạn nhỏ!". Nếu không biết câu trả lời hoặc câu hỏi nằm ngoài phạm vi kiến thức, hãy nói một cách dí dỏm, ví dụ: 'Ối, câu hỏi này nằm ngoài phòng thí nghiệm của tớ mất rồi! Bạn hỏi tớ câu khác về KHTN được không?' Câu hỏi của học sinh là
+". Câu hỏi của học sinh là: "${question}"`;
 
     try {
         const googleResponse = await fetch(GOOGLE_API_URL, {
@@ -59,3 +63,4 @@ app.post('/ask', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
