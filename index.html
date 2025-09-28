@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Học liệu KHTN 7: Đo Tốc Độ</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
     <style>
-        :root{--primary-color:#0056b3;--secondary-color:#ff8c00;--bg-color:#f4f7fc;--card-bg-color:#ffffff;--text-color:#333333;--light-gray-color:#e9ecef;--success-color:#28a745;--error-color:#dc3545}*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;line-height:1.6;background-color:var(--bg-color);color:var(--text-color);display:flex;flex-direction:column;align-items:center}header{background-color:var(--primary-color);color:white;padding:20px;text-align:center;width:100%}header h1{font-size:2em}main{width:100%;max-width:900px;padding:20px}.card{background-color:var(--card-bg-color);border-radius:10px;box-shadow:0 4px 8px rgba(0,0,0,0.1);padding:25px;margin-bottom:25px}h2{color:var(--primary-color);border-bottom:2px solid var(--secondary-color);padding-bottom:10px;margin-bottom:20px}h3{color:var(--primary-color);margin-top:20px;margin-bottom:10px}ul{list-style-type:'✔ ';padding-left:20px}ul li{margin-bottom:10px}img.illustration{max-width:100%;height:auto;border-radius:8px;margin:15px 0;display:block;margin-left:auto;margin-right:auto}.interactive-section{background:linear-gradient(135deg,var(--primary-color),#007bff);color:white}.interactive-section h2{color:white;border-bottom-color:var(--secondary-color)}.form-group{margin-bottom:15px}.form-group label{display:block;margin-bottom:5px;font-weight:bold}.form-group input[type=number],.form-group input[type=text]{width:100%;padding:12px;border-radius:5px;border:1px solid #ccc;font-size:1rem}button{background-color:var(--secondary-color);color:white;border:none;padding:12px 25px;font-size:1rem;font-weight:bold;border-radius:5px;cursor:pointer;transition:background-color .3s}button:hover{background-color:#e67e00}#speedResult,#quizResult{margin-top:15px;padding:15px;background-color:var(--bg-color);color:var(--text-color);border-radius:5px;font-weight:bold;text-align:center}.quiz-question{margin-bottom:20px;background-color:#f8f9fa;padding:15px;border-radius:8px;border-left:5px solid var(--secondary-color)}.quiz-question p{font-weight:bold}.quiz-options label{display:block;padding:8px;margin:5px 0;border-radius:5px;cursor:pointer;background-color:var(--light-gray-color);transition:background-color .2s}.quiz-options label:hover{background-color:#dcdcdc}.quiz-options input[type=radio]{margin-right:10px}#ai-chatbot-card{background:#e9f5ff}.chat-window{height:300px;border:1px solid #ccc;border-radius:8px;padding:10px;overflow-y:auto;background-color:white;margin-bottom:15px;display:flex;flex-direction:column}.chat-message{max-width:80%;padding:10px 15px;border-radius:15px;margin-bottom:10px;line-height:1.4}.user-message{background-color:var(--primary-color);color:white;align-self:flex-end;border-bottom-right-radius:3px}.ai-message{background-color:#f1f1f1;color:var(--text-color);align-self:flex-start;border-bottom-left-radius:3px}.chat-input-area{display:flex;gap:10px}.chat-input-area input{flex-grow:1}@media (max-width:768px){header h1{font-size:1.5em}main{padding:10px}.card{padding:15px}}
+        /* ... phần css của bạn ... */
     </style>
 </head>
 <body>
@@ -103,8 +106,7 @@
                 }
 
                 const data = await response.json();
-                waitingMessage.innerHTML = data.answer.replace(/\n/g, '<br>');
-
+                waitingMessage.innerHTML = marked.parse(data.answer);
             } catch (error) {
                 console.error("Lỗi:", error);
                 waitingMessage.textContent = `Xin lỗi, đã có lỗi: ${error.message}`;
@@ -122,3 +124,4 @@
     </script>
 </body>
 </html>
+
