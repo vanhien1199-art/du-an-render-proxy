@@ -1,7 +1,7 @@
 {
-  "name": "ai-proxy-service",
+  "name": "ai-trung-tam-service",
   "version": "1.0.0",
-  "description": "Proxy service for Google AI",
+  "description": "Central AI service for learning materials",
   "main": "askAI.js",
   "scripts": {
     "start": "node askAI.js"
@@ -9,6 +9,6 @@
   "dependencies": {
     "express": "^4.19.2",
     "cors": "^2.8.5",
-    "node-fetch": "^2.6.7"
+    "@google/generative-ai": "^0.14.1"
   }
 }

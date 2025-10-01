@@ -2,127 +2,17 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Học liệu KHTN 7: Đo Tốc Độ</title>
-        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-        <style>
-       :root{--primary-color:#0056b3;--secondary-color:#ff8c00;--bg-color:#f4f7fc;--card-bg-color:#ffffff;--text-color:#333333;--light-gray-color:#e9ecef;--success-color:#28a745;--error-color:#dc3545}*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;line-height:1.6;background-color:var(--bg-color);color:var(--text-color);display:flex;flex-direction:column;align-items:center}header{background-color:var(--primary-color);color:white;padding:20px;text-align:center;width:100%}header h1{font-size:2em}main{width:100%;max-width:900px;padding:20px}.card{background-color:var(--card-bg-color);border-radius:10px;box-shadow:0 4px 8px rgba(0,0,0,0.1);padding:25px;margin-bottom:25px}h2{color:var(--primary-color);border-bottom:2px solid var(--secondary-color);padding-bottom:10px;margin-bottom:20px}h3{color:var(--primary-color);margin-top:20px;margin-bottom:10px}ul{list-style-type:'✔ ';padding-left:20px}ul li{margin-bottom:10px}img.illustration{max-width:100%;height:auto;border-radius:8px;margin:15px 0;display:block;margin-left:auto;margin-right:auto}.interactive-section{background:linear-gradient(135deg,var(--primary-color),#007bff);color:white}.interactive-section h2{color:white;border-bottom-color:var(--secondary-color)}.form-group{margin-bottom:15px}.form-group label{display:block;margin-bottom:5px;font-weight:bold}.form-group input[type=number],.form-group input[type=text]{width:100%;padding:12px;border-radius:5px;border:1px solid #ccc;font-size:1rem}button{background-color:var(--secondary-color);color:white;border:none;padding:12px 25px;font-size:1rem;font-weight:bold;border-radius:5px;cursor:pointer;transition:background-color .3s}button:hover{background-color:#e67e00}#speedResult,#quizResult{margin-top:15px;padding:15px;background-color:var(--bg-color);color:var(--text-color);border-radius:5px;font-weight:bold;text-align:center}.quiz-question{margin-bottom:20px;background-color:#f8f9fa;padding:15px;border-radius:8px;border-left:5px solid var(--secondary-color)}.quiz-question p{font-weight:bold}.quiz-options label{display:block;padding:8px;margin:5px 0;border-radius:5px;cursor:pointer;background-color:var(--light-gray-color);transition:background-color .2s}.quiz-options label:hover{background-color:#dcdcdc}.quiz-options input[type=radio]{margin-right:10px}#ai-chatbot-card{background:#e9f5ff}.chat-window{height:300px;border:1px solid #ccc;border-radius:8px;padding:10px;overflow-y:auto;background-color:white;margin-bottom:15px;display:flex;flex-direction:column}.chat-message{max-width:80%;padding:10px 15px;border-radius:15px;margin-bottom:10px;line-height:1.4}.user-message{background-color:var(--primary-color);color:white;align-self:flex-end;border-bottom-right-radius:3px}.ai-message{background-color:#f1f1f1;color:var(--text-color);align-self:flex-start;border-bottom-left-radius:3px}.chat-input-area{display:flex;gap:10px}.chat-input-area input{flex-grow:1}@media (max-width:768px){header h1{font-size:1.5em}main{padding:10px}.card{padding:15px}}
-    </style>
-    </style>
+    <title>Danh sách Học liệu KHTN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
 </head>
 <body>
-    <header>
-        <h1>Bài học: Đo Tốc Độ</h1>
-        <p>KHTN 7 - Bộ sách Kết nối tri thức</p>
-    </header>
-    <main>
-        <section id="muc-tieu" class="card">
-             <h2>🎯 Mục tiêu bài học</h2>
-            <ul>
-                <li>Nêu được khái niệm tốc độ, ý nghĩa của tốc độ.</li>
-                <li>Viết được công thức tính tốc độ.</li>
-                <li>Vận dụng công thức để giải các bài tập tính tốc độ, quãng đường, thời gian đơn giản.</li>
+    <div class="container">
+        <h1>Danh sách Học liệu Khoa học Tự nhiên</h1>
+        <p>Chọn một bài học để bắt đầu:</p>
+        <ul>
+            <li><a href="/bai-1/">Bài học: Đo Tốc độ</a></li>
+            <li><a href="/bai-2/">Bài học: Quang hợp</a></li>
             </ul>
-        </section>
-        <section id="kien-thuc" class="card">
-            <h3>1. Khái niệm Tốc độ</h3>
-            <p>Tốc độ cho biết mức độ nhanh hay chậm của chuyển động. Tốc độ được xác định bằng quãng đường đi được trong một đơn vị thời gian.</p>
-            <h3>2. Công thức tính tốc độ</h3>
-            <div style="background: #eef; padding: 15px; border-radius: 5px; text-align: center; font-size: 1.2em; font-weight: bold; margin: 15px 0;">v = s / t</div>
-            <p><strong>Trong đó:</strong></p>
-            <ul><li><b>v:</b> là tốc độ</li><li><b>s:</b> là quãng đường</li><li><b>t:</b> là thời gian</li></ul>
-            <h3>3. Đơn vị đo tốc độ</h3>
-            <p>Đơn vị hợp pháp trong hệ đo lường SI là <strong>mét trên giây (m/s)</strong>. Trong thực tế, người ta thường dùng <strong>kilômét trên giờ (km/h)</strong>. (1 m/s = 3.6 km/h)</p>
-        </section>
-        <section id="ai-chatbot-card" class="card">
-            <h2>🤖 Trợ lý AI - Hỏi đáp về bài học</h2>
-            <p>Có điều gì về bài học "Đo Tốc độ" mà em chưa hiểu? Hãy hỏi Trợ lý AI nhé!</p>
-            <div id="chatArea">
-                <div class="chat-window" id="chat-window">
-                    <div class="chat-message ai-message">Xin chào! Tôi có thể giúp gì cho bạn?</div>
-                </div>
-                <div class="chat-input-area">
-                    <input type="text" id="user-input" placeholder="Nhập câu hỏi của bạn..." onkeydown="if(event.key === 'Enter') askAI()">
-                    <button onclick="askAI()">Gửi</button>
-                </div>
-            </div>
-        </section>
-        <section id="bai-tap" class="card interactive-section">
-             <h2>🛠️ Bài tập vận dụng: Máy tính tốc độ</h2>
-             <div class="form-group"><label for="distance">Quãng đường (s):</label><input type="number" id="distance" placeholder="Ví dụ: 100"></div>
-             <div class="form-group"><label for="distanceUnit">Đơn vị:</label><select id="distanceUnit" style="width:100%; padding:12px; border-radius: 5px; border: 1px solid #ccc; font-size: 1rem;"><option value="m">mét (m)</option><option value="km">kilômét (km)</option></select></div>
-             <div class="form-group"><label for="time">Thời gian (t):</label><input type="number" id="time" placeholder="Ví dụ: 10"></div>
-             <div class="form-group"><label for="timeUnit">Đơn vị:</label><select id="timeUnit" style="width:100%; padding:12px; border-radius: 5px; border: 1px solid #ccc; font-size: 1rem;"><option value="s">giây (s)</option><option value="h">giờ (h)</option></select></div>
-             <button onclick="calculateSpeed()">Tính tốc độ</button>
-             <div id="speedResult" style="display: none;"></div>
-        </section>
-        <section id="quiz" class="card">
-            <h2>🧠 Mini Quiz: Kiểm tra nhanh</h2>
-            <form id="quizForm">
-                <div class="quiz-question"><p>Câu 1: Đại lượng nào cho biết mức độ nhanh hay chậm của chuyển động?</p><div class="quiz-options"><label><input type="radio" name="q1" value="b"> Tốc độ</label><label><input type="radio" name="q1" value="a"> Quãng đường</label><label><input type="radio" name="q1" value="c"> Thời gian</label></div></div>
-                <div class="quiz-question"><p>Câu 2: Công thức tính tốc độ là gì?</p><div class="quiz-options"><label><input type="radio" name="q2" value="c"> v = s / t</label><label><input type="radio" name="q2" value="a"> v = s * t</label><label><input type="radio" name="q2" value="b"> v = t / s</label></div></div>
-                <div class="quiz-question"><p>Câu 3: Một người đi xe đạp 18 km hết 1.5 giờ. Tốc độ là bao nhiêu?</p><div class="quiz-options"><label><input type="radio" name="q3" value="a"> 12 km/h</label><label><input type="radio" name="q3" value="b"> 27 km/h</label><label><input type="radio" name="q3" value="c"> 18 km/h</label></div></div>
-                <div class="quiz-question"><p>Câu 4: Đơn vị đo tốc độ trong hệ SI là gì?</p><div class="quiz-options"><label><input type="radio" name="q4" value="b"> m/s</label><label><input type="radio" name="q4" value="a"> km/h</label><label><input type="radio" name="q4" value="c"> cm/s</label></div></div>
-                <button type="submit">Nộp bài</button>
-            </form>
-            <div id="quizResult" style="display: none;"></div>
-        </section>
-    </main>
-
-    <script>
-        // --- Hàm tính tốc độ ---
-        function calculateSpeed(){const s=parseFloat(document.getElementById("distance").value),sUnit=document.getElementById("distanceUnit").value,t=parseFloat(document.getElementById("time").value),tUnit=document.getElementById("timeUnit").value,resultDiv=document.getElementById("speedResult");if(isNaN(s)||isNaN(t))return resultDiv.innerHTML="Vui lòng nhập số hợp lệ!",resultDiv.style.backgroundColor="var(--error-color)",resultDiv.style.color="white",void(resultDiv.style.display="block");if(t<=0)return resultDiv.innerHTML="Thời gian phải lớn hơn 0!",resultDiv.style.backgroundColor="var(--error-color)",resultDiv.style.color="white",void(resultDiv.style.display="block");let finalUnit="";if("m"===sUnit&&"s"===tUnit)finalUnit="m/s";else{if("km"!==sUnit||"h"!==tUnit)return resultDiv.innerHTML=`Không thể tính trực tiếp với đơn vị ${sUnit}/${tUnit}.`,resultDiv.style.backgroundColor="var(--error-color)",resultDiv.style.color="white",void(resultDiv.style.display="block");finalUnit="km/h"}const speed=s/t;resultDiv.innerHTML=`Tốc độ tính được là: <strong>${speed.toFixed(2)} ${finalUnit}</strong>`,resultDiv.style.backgroundColor="var(--success-color)",resultDiv.style.color="white",resultDiv.style.display="block"}
-        
-        // --- Hàm chấm quiz ---
-        const quizForm=document.getElementById("quizForm");quizForm.addEventListener("submit",function(e){e.preventDefault();const t={q1:"b",q2:"c",q3:"a",q4:"b"};let l=0;const o=Object.keys(t).length,r={q1:quizForm.elements.q1.value,q2:quizForm.elements.q2.value,q3:quizForm.elements.q3.value,q4:quizForm.elements.q4.value};for(const c in r)r[c]===t[c]&&l++;const s=document.getElementById("quizResult");s.innerHTML=`Kết quả của bạn: <strong>${l} / ${o}</strong> câu đúng.`,s.style.display="block",l===o?(s.innerHTML+="<br>🎉 Chúc mừng! Em đã nắm rất vững bài học!",s.style.backgroundColor="var(--success-color)",s.style.color="white"):(s.innerHTML+="<br>Hãy xem lại phần kiến thức để hiểu rõ hơn nhé!",s.style.backgroundColor="var(--secondary-color)",s.style.color="white")});
-        
-        // --- Các hàm cho AI Chatbot ---
-        const chatWindow = document.getElementById('chat-window');
-        const userInput = document.getElementById('user-input');
-
-        // *** DÒNG QUAN TRỌNG NHẤT - ĐÃ SỬA ĐÚNG URL CỦA THẦY/CÔ ***
-        const AI_SERVICE_URL = 'https://du-an-render-proxy.onrender.com';
-
-        async function askAI() {
-            const question = userInput.value.trim();
-            if (!question) return;
-
-            addMessageToChat(question, 'user-message');
-            userInput.value = '';
-            const waitingMessage = addMessageToChat('Trợ lý AI đang suy nghĩ...', 'ai-message');
-
-            try {
-                const response = await fetch(`${AI_SERVICE_URL}/ask`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question: question })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || 'Lỗi không xác định');
-                }
-
-                const data = await response.json();
-                waitingMessage.innerHTML = marked.parse(data.answer);
-            } catch (error) {
-                console.error("Lỗi:", error);
-                waitingMessage.textContent = `Xin lỗi, đã có lỗi: ${error.message}`;
-            }
-        }
-
-        function addMessageToChat(text, className) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('chat-message', className);
-            messageElement.innerHTML = text;
-            chatWindow.appendChild(messageElement);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-            return messageElement;
-        }
-    </script>
+    </div>
 </body>
 </html>
-
-
-
-
