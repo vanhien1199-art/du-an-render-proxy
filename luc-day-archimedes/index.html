@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 17: Lực đẩy Archimedes</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <script>
+        window.lessonId = 'luc-day-archimedes';
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatWindow = document.getElementById('chat-window');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const AI_SERVICE_URL = 'https://ai-trung-tam-service.onrender.com';
+            const LESSON_ID = window.lessonId || 'default';
+            if(sendButton){
+                sendButton.addEventListener('click', askAI);
+                userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') askAI(); });
+            }
+            function addMessageToChat(text, className) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('chat-message', className);
+                chatWindow.appendChild(messageElement);
+                messageElement.innerHTML = marked.parse(text);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                return messageElement;
+            }
+            async function askAI() {
+                const question = userInput.value.trim();
+                if (!question) return;
+                addMessageToChat(question, 'user-message');
+                userInput.value = '';
+                const waitingMessage = addMessageToChat('Trợ lý AI đang suy nghĩ...', 'ai-message');
+                try {
+                    const response = await fetch(`${AI_SERVICE_URL}/ask`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ question: question, lesson_id: LESSON_ID })
+                    });
+                    if (!response.ok) throw new Error('Lỗi mạng hoặc server');
+                    const data = await response.json();
+                    waitingMessage.innerHTML = marked.parse(data.answer);
+                } catch (error) {
+                    waitingMessage.innerHTML = marked.parse('**Xin lỗi, đã có lỗi xảy ra!**');
+                }
+            }
+        });
+    </script>
+
+    <style>
+        :root {
+            --primary-color: #007bff; /* Xanh dương */
+            --secondary-color: #17a2b8; /* Xanh lơ */
+            --bg-color: #f8f9fa;
+            --card-bg-color: #ffffff;
+            --text-color: #343a40;
+            --correct-color: #28a745;
+            --incorrect-color: #dc3545;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.7; background-color: var(--bg-color); color: var(--text-color); margin: 0; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(90deg, var(--primary-color), var(--secondary-color)); color: white; padding: 1.5rem 1rem; text-align: center; margin-bottom: 30px; position: relative; }
+        header h1 { margin: 0; font-size: 2.5em; }
+        .card { background-color: var(--card-bg-color); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); padding: 30px; margin-bottom: 30px; }
+        h2, h3, h4 { color: var(--primary-color); }
+        h2 { border-bottom: 3px solid var(--secondary-color); padding-bottom: 10px; margin-top: 0; }
+        button { background-color: var(--secondary-color); color: white; border: none; padding: 10px 20px; font-size: 1em; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; }
+        button:hover { background-color: #138496; }
+        input[type="number"] { padding: 8px; border-radius: 5px; border: 1px solid #ccc; margin: 0 5px; }
+        
+        .home-btn { position: absolute; top: 50%; left: 20px; transform: translateY(-50%); font-size: 28px; color: white; text-decoration: none; opacity: 0.8; transition: opacity 0.3s, transform 0.3s; }
+        .home-btn:hover { opacity: 1; transform: translateY(-50%) scale(1.1); }
+
+        /* Phần I: PhET */
+        .phet-instructions { background-color: #e7f5ff; padding: 20px; border-left: 5px solid var(--primary-color); border-radius: 5px; }
+        .phet-container { border: 2px solid var(--primary-color); border-radius: 8px; overflow: hidden; margin-top: 20px; }
+        .phet-container iframe { display: block; border: none; }
+        
+        /* Phần II: Trò chơi Chìm/Nổi */
+        .buoyancy-game { text-align: center; }
+        .game-animation { position: relative; height: 200px; background-color: #e0f7fa; border: 2px solid var(--secondary-color); border-radius: 8px; margin: 20px 0; overflow: hidden; }
+        .water-surface { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background-color: #80deea; }
+        #game-object { position: absolute; width: 60px; height: 60px; background-color: #a1887f; border: 2px solid #5d4037; top: 10%; left: calc(50% - 30px); }
+        #game-object.sinking { animation: sink 2s forwards; }
+        #game-object.floating { animation: float-up 2s forwards; }
+        @keyframes sink { 0% { top: 10%; } 100% { top: 110%; } } /* Chìm hẳn xuống đáy */
+        @keyframes float-up { 0% { top: 70%; } 100% { top: 40%; } } /* Nổi lên mặt nước */
+        
+        /* Phần IV: Luyện tập */
+        .exercise-item { border-top: 1px solid #eee; padding-top: 20px; margin-top: 20px; }
+        .feedback { margin-top: 10px; font-weight: bold; padding: 10px; border-radius: 5px; }
+        .feedback.correct { color: #155724; background-color: #d4edda; }
+        .feedback.incorrect { color: #721c24; background-color: #f8d7da; }
+        .solution { display: none; margin-top: 10px; background-color: #f9f9f9; border-left: 3px solid var(--primary-color); padding: 10px; }
+
+        /* CSS Chatbot, Footer, Back-to-Top */
+        .chat-window { height: 300px; border: 1px solid #ccc; padding: 10px; overflow-y: auto; margin-bottom: 10px; }
+        .chat-message { margin-bottom: 10px; } .user-message { text-align: right; }
+        .ai-message { background-color: #f1f1f1; padding: 10px; border-radius: 8px; display: inline-block; max-width: 90%; text-align: left; }
+        .chat-input-area { display: flex; gap: 10px; } .chat-input-area input { flex-grow: 1; }
+        .site-footer { background-color: #333; color: #f1f1f1; padding: 30px 0; font-size: 0.9em; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .site-footer h4 { color: var(--secondary-color); } .site-footer ul { list-style-type: none; padding: 0; }
+        .site-footer a { color: #f1f1f1; text-decoration: none; } .site-footer a:hover { color: var(--secondary-color); }
+        #back-to-top-btn { display: none; position: fixed; bottom: 20px; right: 20px; z-index: 999; background-color: var(--secondary-color); color: white; cursor: pointer; padding: 10px; border-radius: 50%; font-size: 18px; width: 50px; height: 50px; text-align: center; line-height: 30px; text-decoration: none; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: none;}
+        #back-to-top-btn:hover { background-color: var(--primary-color); }
+    </style>
+</head>
+<body id="page-top">
+    <header>
+        <a href="/" class="home-btn" title="Về trang chủ">🏠</a>
+        <h1>Bài 17: LỰC ĐẨY ARCHIMEDES</h1>
+    </header>
+
+    <div class="container">
+        <section id="phan1" class="card">
+            <h2>Phần I: Thí nghiệm ảo với PhET</h2>
+            <div class="phet-instructions">
+                <p>Sử dụng mô phỏng PhET, hãy thả các khối vật có chất liệu khác nhau vào nước. Quan sát và so sánh độ lớn của lực đẩy (F<sub>B</sub>) và trọng lượng của vật (F<sub>g</sub>) để giải thích tại sao vật chìm hoặc nổi.</p>
+            </div>
+            <div class="phet-container">
+                <iframe src="https://phet.colorado.edu/sims/html/buoyancy/latest/buoyancy_vi.html" width="100%" height="500px" allowfullscreen></iframe>
+            </div>
+        </section>
+
+        <section id="phan2" class="card">
+            <h2>Phần II: Trò chơi tương tác "Chìm hay Nổi?"</h2>
+            <div class="buoyancy-game">
+                <p><strong>Tình huống:</strong> Một khối gỗ có trọng lượng <strong>P = 8N</strong>. Nhúng chìm hoàn toàn khối gỗ này (có thể tích V = 0.001 m³) vào nước (có d = 10000 N/m³).</p>
+                <h4>Câu hỏi: Khối gỗ sẽ chìm hay nổi?</h4>
+                <div id="game-controls">
+                    <button id="btn-float">Nổi</button>
+                    <button id="btn-sink">Chìm</button>
+                </div>
+                <div class="game-animation">
+                    <div class="water-surface"></div>
+                    <div id="game-object"></div>
+                </div>
+                <div id="game-feedback" class="feedback"></div>
+            </div>
+        </section>
+
+        <section id="phan3" class="card">
+            <h2>Phần III: Kiến thức cốt lõi cần nhớ</h2>
+            <ul>
+                <li><strong>Định luật Archimedes:</strong> Một vật nhúng trong chất lỏng bị chất lỏng đẩy thẳng đứng từ dưới lên trên với một lực có độ lớn bằng trọng lượng của phần chất lỏng mà vật chiếm chỗ.</li>
+                <li><strong>Công thức tính Lực đẩy Archimedes:</strong> <code>F<sub>A</sub> = d ⋅ V</code>
+                    <ul>
+                        <li><strong>F<sub>A</sub>:</strong> Lực đẩy Archimedes (N).</li>
+                        <li><strong>d:</strong> Trọng lượng riêng của <strong>chất lỏng</strong> (N/m³).</li>
+                        <li><strong>V:</strong> Thể tích của <strong>phần vật chìm</strong> trong chất lỏng (m³).</li>
+                    </ul>
+                </li>
+                <li><strong>Điều kiện chìm, nổi của vật:</strong> (P là trọng lượng của vật)
+                    <ul>
+                        <li>Vật <strong>chìm xuống</strong> khi: <strong>P > F<sub>A</sub></strong></li>
+                        <li>Vật <strong>nổi lên</strong> khi: <strong>P < F<sub>A</sub></strong></li>
+                        <li>Vật <strong>lơ lửng</strong> trong chất lỏng khi: <strong>P = F<sub>A</sub></strong></li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section id="ai-chatbot-card" class="card">
+            <h3>🤖 Trợ lý AI</h3>
+            <p>Bạn có thắc mắc gì về Lực đẩy Archimedes không?</p>
+            <div id="chat-window" class="chat-window"></div>
+            <div class="chat-input-area">
+                <input type="text" id="user-input" placeholder="Ví dụ: Tại sao tàu làm bằng thép lại nổi?">
+                <button id="send-button">Gửi</button>
+            </div>
+        </section>
+
+        <section id="phan4" class="card">
+            <h2>Phần IV: Luyện tập và Vận dụng</h2>
+            <div class="exercise-item">
+                <h4>Bài 1 (Tính toán cơ bản):</h4>
+                <p>Một vật có thể tích 0.002 m³ được nhúng chìm hoàn toàn trong nước (d = 10000 N/m³). Tính độ lớn lực đẩy Archimedes.</p>
+                <input type="number" id="ex1-answer" placeholder="Đáp án (N)">
+                <button onclick="checkEx1()">Kiểm tra</button>
+                <div id="feedback-ex1" class="feedback"></div>
+            </div>
+            <div class="exercise-item">
+                <h4>Bài 2 (Suy luận):</h4>
+                <p>Một vật nặng 50 N. Khi treo vào lực kế và nhúng chìm trong nước, lực kế chỉ 30 N.<br>a) Lực đẩy Archimedes tác dụng lên vật là bao nhiêu?<br>b) Thể tích của vật là bao nhiêu? (d<sub>nước</sub> = 10000 N/m³)</p>
+                a) F<sub>A</sub> = <input type="number" id="ex2a-answer" placeholder="N"> 
+                b) V = <input type="number" id="ex2b-answer" placeholder="m³" step="0.0001">
+                <button onclick="checkEx2()">Kiểm tra</button>
+                <div id="feedback-ex2" class="feedback"></div>
+            </div>
+            <div class="exercise-item">
+                <h4>Bài 3 (Trắc nghiệm vận dụng):</h4>
+                <p>Hai quả cầu sắt có cùng kích thước được nhúng chìm trong hai cốc: một cốc đựng nước, một cốc đựng dầu hỏa. Quả cầu nào chịu lực đẩy Archimedes lớn hơn?</p>
+                <div><label><input type="radio" name="q-ex3" value="a"> Quả cầu trong dầu hỏa.</label></div>
+                <div><label><input type="radio" name="q-ex3" value="b" data-correct="true"> Quả cầu trong nước.</label></div>
+                <div><label><input type="radio" name="q-ex3" value="c"> Hai lực đẩy bằng nhau.</label></div>
+                <div id="feedback-q-ex3" class="feedback"></div>
+            </div>
+             <div class="exercise-item">
+                <h4>Bài 4 (Đúng/Sai):</h4>
+                <p>"Một vật làm bằng gỗ sẽ luôn nổi trong mọi loại chất lỏng."</p>
+                <div><label><input type="radio" name="q-ex4" value="a"> Đúng</label></div>
+                <div><label><input type="radio" name="q-ex4" value="b" data-correct="true"> Sai</label></div>
+                <div id="feedback-q-ex4" class="feedback"></div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div><h4>Nguồn tham khảo</h4><ul><li>Sách giáo khoa KHTN 8 - Bộ sách Kết nối tri thức.</li><li>PhET Interactive Simulations.</li></ul></div>
+                <div><h4>Về trang web</h4><ul><li><a href="/">Về trang danh sách học liệu</a></li></ul></div>
+                <div><h4>Bản quyền & Liên hệ</h4><p>&copy; <span id="copyright-year">nungvanhien</span></p><p>Góp ý: <a href="mailto:gopy@example.com">vanhien1199@gmail.com</a></p></div>
+            </div>
+        </div>
+    </footer>
+    <a href="#page-top" id="back-to-top-btn" title="Lên đầu trang">⬆️</a>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- PHẦN II: TRÒ CHƠI "CHÌM HAY NỔI?" ---
+        const btnFloat = document.getElementById('btn-float');
+        const btnSink = document.getElementById('btn-sink');
+        const gameObject = document.getElementById('game-object');
+        const gameFeedback = document.getElementById('game-feedback');
+        
+        const P_vat = 8; // N
+        const V_vat = 0.001; // m³
+        const d_long = 10000; // N/m³
+        const FA = d_long * V_vat; // 10 N
+        const willFloat = P_vat < FA;
+
+        function playGame(userChoiceIsFloat) {
+            btnFloat.disabled = true;
+            btnSink.disabled = true;
+            
+            if (willFloat) {
+                gameObject.classList.add('floating');
+            } else {
+                gameObject.classList.add('sinking');
+            }
+
+            if (userChoiceIsFloat === willFloat) {
+                gameFeedback.className = 'feedback correct';
+                gameFeedback.innerHTML = `Chính xác! Ta tính được F<sub>A</sub> = d * V = 10000 * 0.001 = 10 N. <br> Vì P (8N) < F<sub>A</sub> (10N) nên vật sẽ nổi.`;
+            } else {
+                gameFeedback.className = 'feedback incorrect';
+                gameFeedback.innerHTML = `Chưa đúng! Ta tính được F<sub>A</sub> = d * V = 10000 * 0.001 = 10 N. <br> Vì P (8N) < F<sub>A</sub> (10N) nên vật phải nổi lên.`;
+            }
+        }
+        btnFloat.addEventListener('click', () => playGame(true));
+        btnSink.addEventListener('click', () => playGame(false));
+
+        // --- PHẦN IV: LUYỆN TẬP ---
+        // Bài 1
+        window.checkEx1 = function() {
+            const answer = parseFloat(document.getElementById('ex1-answer').value);
+            const feedback = document.getElementById('feedback-ex1');
+            const correctAnswer = 10000 * 0.002;
+            if (answer === correctAnswer) {
+                feedback.textContent = `Chính xác! Fₐ = d * V = 10000 * 0.002 = 20 N.`;
+                feedback.className = 'feedback correct';
+            } else {
+                feedback.textContent = "Chưa đúng, hãy áp dụng công thức Fₐ = d * V.";
+                feedback.className = 'feedback incorrect';
+            }
+        };
+        // Bài 2
+        window.checkEx2 = function() {
+            const fa_answer = parseFloat(document.getElementById('ex2a-answer').value);
+            const v_answer = parseFloat(document.getElementById('ex2b-answer').value);
+            const feedback = document.getElementById('feedback-ex2');
+            const fa_correct = 50 - 30;
+            const v_correct = fa_correct / 10000;
+
+            if (fa_answer === fa_correct && Math.abs(v_answer - v_correct) < 0.0001) {
+                feedback.innerHTML = `Tuyệt vời! Fₐ = P - P' = 50 - 30 = 20 N.<br>V = Fₐ / d = 20 / 10000 = 0.002 m³.`;
+                feedback.className = 'feedback correct';
+            } else {
+                feedback.textContent = "Chưa chính xác. Lực đẩy chính là độ giảm biểu kiến của trọng lượng.";
+                feedback.className = 'feedback incorrect';
+            }
+        };
+        // Bài 3 & 4
+        document.querySelectorAll('#practice-quiz input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const name = this.name;
+                const feedbackEl = document.getElementById('feedback-' + name);
+                let explanation = '';
+                if (name === 'q-ex3' && this.dataset.correct) explanation = "Đúng! Vì thể tích chiếm chỗ như nhau nhưng trọng lượng riêng của nước lớn hơn dầu hỏa.";
+                if (name === 'q-ex4' && this.dataset.correct) explanation = "Đúng! Gỗ sẽ chìm trong thủy ngân vì trọng lượng riêng của gỗ nhỏ hơn thủy ngân.";
+                
+                if (this.dataset.correct) {
+                    feedbackEl.textContent = explanation || "Chính xác!";
+                    feedbackEl.className = 'feedback correct';
+                } else {
+                    feedbackEl.textContent = "Chưa đúng, hãy suy nghĩ lại.";
+                    feedbackEl.className = 'feedback incorrect';
+                }
+            });
+        });
+
+        // --- FOOTER & BACK-TO-TOP ---
+        const backToTopBtn = document.getElementById("back-to-top-btn");
+        if(backToTopBtn){ window.onscroll = function() { if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) { backToTopBtn.style.display = "block"; } else { backToTopBtn.style.display = "none"; } }; }
+        const yearSpan = document.getElementById('copyright-year');
+        if (yearSpan) { yearSpan.textContent = new Date().getFullYear(); }
+    });
+    </script>
+</body>
+</html>
