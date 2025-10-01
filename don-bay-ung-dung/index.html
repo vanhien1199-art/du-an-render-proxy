@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 19: Đòn bẩy và ứng dụng</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <script>
+        window.lessonId = 'don-bay';
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatWindow = document.getElementById('chat-window');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const AI_SERVICE_URL = 'https://ai-trung-tam-service.onrender.com';
+            const LESSON_ID = window.lessonId || 'default';
+            if(sendButton){
+                sendButton.addEventListener('click', askAI);
+                userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') askAI(); });
+            }
+            function addMessageToChat(text, className) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('chat-message', className);
+                chatWindow.appendChild(messageElement);
+                messageElement.innerHTML = marked.parse(text);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                return messageElement;
+            }
+            async function askAI() {
+                const question = userInput.value.trim();
+                if (!question) return;
+                addMessageToChat(question, 'user-message');
+                userInput.value = '';
+                const waitingMessage = addMessageToChat('Trợ lý AI đang suy nghĩ...', 'ai-message');
+                try {
+                    const response = await fetch(`${AI_SERVICE_URL}/ask`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ question: question, lesson_id: LESSON_ID })
+                    });
+                    if (!response.ok) throw new Error('Lỗi mạng hoặc server');
+                    const data = await response.json();
+                    waitingMessage.innerHTML = marked.parse(data.answer);
+                } catch (error) {
+                    waitingMessage.innerHTML = marked.parse('**Xin lỗi, đã có lỗi xảy ra!**');
+                }
+            }
+        });
+    </script>
+
+    <style>
+        :root {
+            --primary-color: #4e342e; /* Nâu đậm */
+            --secondary-color: #ffb74d; /* Cam nhạt */
+            --bg-color: #efebe9;
+            --card-bg-color: #ffffff;
+            --text-color: #3e2723;
+            --correct-color: #4caf50;
+            --incorrect-color: #f44336;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.7; background-color: var(--bg-color); color: var(--text-color); margin: 0; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background-color: var(--primary-color); color: white; padding: 1.5rem 1rem; text-align: center; margin-bottom: 30px; position: relative; }
+        header h1 { margin: 0; font-size: 2.5em; }
+        .card { background-color: var(--card-bg-color); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); padding: 30px; margin-bottom: 30px; }
+        h2, h3, h4 { color: var(--primary-color); }
+        h2 { border-bottom: 3px solid var(--secondary-color); padding-bottom: 10px; margin-top: 0; }
+        button { background-color: var(--secondary-color); color: var(--text-color); border: none; padding: 10px 20px; font-size: 1em; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; }
+        button:hover { background-color: #ffa726; }
+        input[type="number"] { padding: 8px; border-radius: 5px; border: 1px solid #ccc; margin: 5px; }
+        
+        .home-btn { position: absolute; top: 50%; left: 20px; transform: translateY(-50%); font-size: 28px; color: white; text-decoration: none; opacity: 0.8; transition: opacity 0.3s, transform 0.3s; }
+        .home-btn:hover { opacity: 1; transform: translateY(-50%) scale(1.1); }
+        
+        /* Phần I: PhET */
+        .phet-container { border: 2px solid var(--primary-color); border-radius: 8px; overflow: hidden; margin-top: 20px; }
+        .phet-container iframe { display: block; border: none; }
+
+        /* Phần II: Trò chơi phân loại */
+        .lever-game { text-align: center; }
+        .game-image-container img { max-width: 250px; height: 150px; object-fit: contain; margin: 15px 0; border: 1px solid #ddd; border-radius: 5px;}
+        .game-controls button { margin: 5px; }
+        .game-feedback { margin-top: 15px; background: #f5f5f5; padding: 10px; border-radius: 5px; min-height: 50px; }
+
+        /* Phần III: Kiến thức */
+        .lever-types-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; text-align: center; }
+        .lever-type-card { border: 1px solid #eee; padding: 15px; border-radius: 8px; }
+        .lever-type-card svg { width: 100%; height: 60px; }
+
+        /* Phần IV: Luyện tập */
+        .exercise-item { border-top: 1px solid #eee; padding-top: 20px; margin-top: 20px; }
+        .feedback { margin-top: 10px; font-weight: bold; }
+        .feedback.correct { color: var(--correct-color); }
+        .feedback.incorrect { color: var(--incorrect-color); }
+        .solution { display: none; margin-top: 10px; background-color: #f9f9f9; border-left: 3px solid var(--primary-color); padding: 10px; }
+
+        /* CSS Chatbot, Footer, Back-to-Top */
+        .chat-window { height: 300px; border: 1px solid #ccc; padding: 10px; overflow-y: auto; margin-bottom: 10px; }
+        .chat-message { margin-bottom: 10px; } .user-message { text-align: right; }
+        .ai-message { background-color: #f1f1f1; padding: 10px; border-radius: 8px; display: inline-block; max-width: 90%; text-align: left; }
+        .chat-input-area { display: flex; gap: 10px; } .chat-input-area input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; }
+        .site-footer { background-color: #333; color: #f1f1f1; padding: 30px 0; font-size: 0.9em; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .site-footer h4 { color: var(--secondary-color); } .site-footer ul { list-style-type: none; padding: 0; }
+        .site-footer a { color: #f1f1f1; text-decoration: none; } .site-footer a:hover { color: var(--secondary-color); }
+        #back-to-top-btn { display: none; position: fixed; bottom: 20px; right: 20px; z-index: 999; background-color: var(--secondary-color); color: var(--text-color); cursor: pointer; padding: 10px; border-radius: 50%; font-size: 18px; width: 50px; height: 50px; text-align: center; line-height: 30px; text-decoration: none; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: none;}
+        #back-to-top-btn:hover { background-color: var(--primary-color); color: white; }
+    </style>
+</head>
+<body id="page-top">
+    <header>
+        <a href="/" class="home-btn" title="Về trang chủ">🏠</a>
+        <h1>Bài 19: ĐÒN BẨY VÀ ỨNG DỤNG</h1>
+    </header>
+
+    <div class="container">
+        <section id="phan1" class="card">
+            <h2>Phần I: Khám phá Đòn bẩy với Thí nghiệm ảo PhET</h2>
+            <p>Sử dụng mô phỏng PhET, hãy đặt các khối gạch ở hai bên để làm cho đòn bẩy thăng bằng. Hãy thử thay đổi khối lượng và vị trí của chúng để tìm ra quy luật nhé!</p>
+            <div class="phet-container">
+                <iframe src="https://phet.colorado.edu/sims/html/balancing-act/latest/balancing-act_vi.html" width="100%" height="500px" allowfullscreen></iframe>
+            </div>
+        </section>
+
+        <section id="phan2" class="card">
+            <h2>Phần II: Trò chơi tương tác "Phân loại Đòn bẩy"</h2>
+            <div class="lever-game">
+                <h4 id="game-item-name"></h4>
+                <div class="game-image-container">
+                    <img id="game-image" src="" alt="Dụng cụ đòn bẩy">
+                </div>
+                <p>Theo em, đây là đòn bẩy loại mấy?</p>
+                <div id="game-controls">
+                    <button data-type="1">Loại 1</button>
+                    <button data-type="2">Loại 2</button>
+                    <button data-type="3">Loại 3</button>
+                </div>
+                <div class="game-feedback" id="game-feedback"></div>
+                <button id="next-game-item" style="display:none; margin-top: 10px;">Tiếp theo</button>
+            </div>
+        </section>
+
+        <section id="phan3" class="card">
+            <h2>Phần III: Kiến thức cốt lõi cần nhớ</h2>
+            <div class="lever-types-grid">
+                <div class="lever-type-card">
+                    <h4>Đòn bẩy Loại 1</h4>
+                    <svg class="lever-diagram" viewBox="0 0 100 30">
+                        <line x1="10" y1="15" x2="90" y2="15" stroke="black" stroke-width="2"/>
+                        <polygon points="45,15 55,15 50,25" fill="var(--primary-color)"/>
+                        <text x="48" y="29">O</text>
+                        <line x1="25" y1="15" x2="25" y2="5" stroke="red" stroke-width="2" marker-end="url(#arrow-red)"/>
+                        <text x="22" y="4">F₁</text>
+                        <line x1="75" y1="15" x2="75" y2="5" stroke="blue" stroke-width="2" marker-end="url(#arrow-blue)"/>
+                        <text x="72" y="4">F₂</text>
+                    </svg>
+                    <p><strong>Điểm tựa (O)</strong> nằm giữa Lực tác dụng (F₁) và Lực cản (F₂). </p>
+                    <p><em>Ví dụ: Bập bênh, cái kéo, kìm.</em></p>
+                </div>
+                <div class="lever-type-card">
+                    <h4>Đòn bẩy Loại 2</h4>
+                    <svg class="lever-diagram" viewBox="0 0 100 30">
+                        <line x1="10" y1="15" x2="90" y2="15" stroke="black" stroke-width="2"/>
+                        <polygon points="5,15 15,15 10,25" fill="var(--primary-color)"/>
+                        <text x="8" y="29">O</text>
+                        <line x1="50" y1="15" x2="50" y2="5" stroke="blue" stroke-width="2" marker-end="url(#arrow-blue)"/>
+                        <text x="47" y="4">F₂</text>
+                        <line x1="80" y1="15" x2="80" y2="5" stroke="red" stroke-width="2" marker-end="url(#arrow-red)"/>
+                        <text x="77" y="4">F₁</text>
+                    </svg>
+                    <p><strong>Lực cản (F₂)</strong> nằm giữa Điểm tựa (O) và Lực tác dụng (F₁).</p>
+                    <p><em>Ví dụ: Xe rùa, đồ mở nắp chai.</em></p>
+                </div>
+                <div class="lever-type-card">
+                    <h4>Đòn bẩy Loại 3</h4>
+                    <svg class="lever-diagram" viewBox="0 0 100 30">
+                        <line x1="10" y1="15" x2="90" y2="15" stroke="black" stroke-width="2"/>
+                        <polygon points="5,15 15,15 10,25" fill="var(--primary-color)"/>
+                        <text x="8" y="29">O</text>
+                        <line x1="50" y1="15" x2="50" y2="5" stroke="red" stroke-width="2" marker-end="url(#arrow-red)"/>
+                        <text x="47" y="4">F₁</text>
+                        <line x1="80" y1="15" x2="80" y2="5" stroke="blue" stroke-width="2" marker-end="url(#arrow-blue)"/>
+                        <text x="77" y="4">F₂</text>
+                        <defs>
+                           <marker id="arrow-red" markerWidth="5" markerHeight="3.5" refX="0" refY="1.75" orient="auto"><polygon points="0 0, 5 1.75, 0 3.5" fill="red"/></marker>
+                           <marker id="arrow-blue" markerWidth="5" markerHeight="3.5" refX="0" refY="1.75" orient="auto"><polygon points="0 0, 5 1.75, 0 3.5" fill="blue"/></marker>
+                        </defs>
+                    </svg>
+                    <p><strong>Lực tác dụng (F₁)</strong> nằm giữa Điểm tựa (O) và Lực cản (F₂).</p>
+                    <p><em>Ví dụ: Cần câu cá, cái gắp.</em></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="ai-chatbot-card" class="card">
+            <h3>🤖 Trợ lý AI</h3>
+            <p>Bạn có thắc mắc gì về các loại đòn bẩy hay ứng dụng của chúng không?</p>
+            <div id="chat-window" class="chat-window"></div>
+            <div class="chat-input-area">
+                <input type="text" id="user-input" placeholder="Ví dụ: Đòn bẩy loại 2 cho ta lợi gì?">
+                <button id="send-button">Gửi</button>
+            </div>
+        </section>
+
+        <section id="phan4" class="card">
+            <h2>Phần IV: Luyện tập và Vận dụng</h2>
+            <div class="exercise-item">
+                <h4>Bài 1 (Trắc nghiệm):</h4>
+                <p>Trong các dụng cụ sau, dụng cụ nào không phải là ứng dụng của đòn bẩy?</p>
+                <div><label><input type="radio" name="ex1" value="a"> Búa (dùng để nhổ đinh)</label></div>
+                <div><label><input type="radio" name="ex1" value="b" data-correct="true"> Tuốc-nơ-vít (dùng để vặn vít)</label></div>
+                <div><label><input type="radio" name="ex1" value="c"> Kìm</label></div>
+                <div id="feedback-ex1" class="feedback"></div>
+            </div>
+            <div class="exercise-item">
+                <h4>Bài 2, 3, 5 (Giải thích):</h4>
+                <button onclick="toggleSolution('sol2')">Xem giải thích: Dùng xà beng bẩy tảng đá</button>
+                <div class="solution" id="sol2"><p>Điểm tựa là hòn đá nhỏ kê dưới xà beng. Cánh tay đòn của lực tác dụng là khoảng cách từ hòn đá kê đến tay người. Cánh tay đòn của tảng đá là khoảng cách từ hòn đá kê đến điểm xà beng tiếp xúc tảng đá.</p></div>
+                <button onclick="toggleSolution('sol3')">Xem giải thích: Kê miếng gỗ dưới búa khi nhổ đinh</button>
+                <div class="solution" id="sol3"><p>Việc kê miếng gỗ làm tăng độ dài cánh tay đòn của lực tác dụng (từ điểm tựa đến tay), giúp tạo ra moment lực lớn hơn, nhờ đó nhổ đinh dễ dàng hơn.</p></div>
+                 <button onclick="toggleSolution('sol5')">Xem giải thích: Cánh tay người là đòn bẩy loại mấy?</button>
+                <div class="solution" id="sol5"><p>Cánh tay người là đòn bẩy loại 3. Điểm tựa là khuỷu tay (O), lực cơ của bắp tay tác dụng (F₁) ở giữa, và lực cản của quả tạ (F₂) ở bàn tay.</p></div>
+            </div>
+             <div class="exercise-item">
+                <h4>Bài 4 (Tính toán):</h4>
+                <p>Một người gánh một thùng nước nặng 150N (F₂) và một thùng gạo nặng 100N (F₁). Đòn gánh dài 1.5m. Hỏi vai người đó (điểm tựa O) phải đặt ở đâu và chịu một lực bằng bao nhiêu để đòn gánh cân bằng?</p>
+                Vai cách thùng gạo: <input type="number" id="ex4-d1" placeholder="m">
+                Lực vai chịu: <input type="number" id="ex4-F" placeholder="N">
+                <button onclick="checkCalc()">Kiểm tra</button>
+                <div id="feedback-ex4" class="feedback"></div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div><h4>Nguồn tham khảo</h4><ul><li>Sách giáo khoa KHTN 8 - Bộ sách Kết nối tri thức.</li><li>PhET Interactive Simulations.</li></ul></div>
+                <div><h4>Về trang web</h4><ul><li><a href="/">Về trang danh sách học liệu</a></li></ul></div>
+                <div><h4>Bản quyền & Liên hệ</h4><p>&copy; <span id="copyright-year"></span>-nungvanhien</p><p>Góp ý: <a href="mailto:gopy@example.com">vanhien1199@gmail.com</a></p></div>
+            </div>
+        </div>
+    </footer>
+    <a href="#page-top" id="back-to-top-btn" title="Lên đầu trang">⬆️</a>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- PHẦN II: TRÒ CHƠI PHÂN LOẠI ĐÒN BẨY ---
+        const gameItems = [
+            { name: 'Cái kéo', image: 'https://placehold.co/250x150/EFEFEF/333?text=Cái+kéo', type: 1, explanation: 'Đúng! Cái kéo là đòn bẩy loại 1 vì Điểm tựa (ốc vít) nằm giữa Lực tay (F₁) và Lực cắt (F₂).' },
+            { name: 'Xe rùa', image: 'https://placehold.co/250x150/EFEFEF/333?text=Xe+rùa', type: 2, explanation: 'Chính xác! Xe rùa là đòn bẩy loại 2 vì Lực cản (vật nặng) nằm giữa Điểm tựa (bánh xe) và Lực nâng (tay người).' },
+            { name: 'Cần câu cá', image: 'https://placehold.co/250x150/EFEFEF/333?text=Cần+câu', type: 3, explanation: 'Tuyệt vời! Cần câu là đòn bẩy loại 3 vì Lực kéo (tay) nằm giữa Điểm tựa (chuôi cần) và Lực cản (con cá).' }
+        ];
+        let currentGameIndex = 0;
+        const gameItemName = document.getElementById('game-item-name');
+        const gameImage = document.getElementById('game-image');
+        const gameFeedback = document.getElementById('game-feedback');
+        const gameControls = document.getElementById('game-controls');
+        const nextButton = document.getElementById('next-game-item');
+
+        function loadGameItem(index) {
+            gameItemName.textContent = gameItems[index].name;
+            gameImage.src = gameItems[index].image;
+            gameFeedback.innerHTML = '';
+            gameControls.style.display = 'block';
+            nextButton.style.display = 'none';
+        }
+
+        gameControls.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') {
+                const userChoice = parseInt(e.target.dataset.type);
+                const correctType = gameItems[currentGameIndex].type;
+                gameFeedback.innerHTML = gameItems[currentGameIndex].explanation;
+                gameFeedback.className = (userChoice === correctType) ? 'game-feedback feedback correct' : 'game-feedback feedback incorrect';
+                gameControls.style.display = 'none';
+                if(currentGameIndex < gameItems.length - 1) {
+                    nextButton.style.display = 'inline-block';
+                }
+            }
+        });
+        
+        nextButton.addEventListener('click', () => {
+            currentGameIndex++;
+            loadGameItem(currentGameIndex);
+        });
+        
+        loadGameItem(0); // Bắt đầu trò chơi
+
+        // --- PHẦN IV: LUYỆN TẬP ---
+        // Giải thích
+        window.toggleSolution = function(id) {
+            const sol = document.getElementById(id);
+            sol.style.display = sol.style.display === 'block' ? 'none' : 'block';
+        };
+        // Trắc nghiệm
+        document.querySelectorAll('input[name="ex1"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const feedback = document.getElementById('feedback-ex1');
+                if (this.dataset.correct) {
+                    feedback.textContent = 'Đúng! Tuốc-nơ-vít là ứng dụng của mặt phẳng nghiêng (rãnh xoắn).';
+                    feedback.className = 'feedback correct';
+                } else {
+                    feedback.textContent = 'Chưa đúng. Búa và kìm đều có cấu tạo và nguyên lý hoạt động của đòn bẩy.';
+                    feedback.className = 'feedback incorrect';
+                }
+            });
+        });
+        // Tính toán
+        window.checkCalc = function() {
+            const d1_ans = parseFloat(document.getElementById('ex4-d1').value);
+            const F_ans = parseFloat(document.getElementById('ex4-F').value);
+            const feedback = document.getElementById('feedback-ex4');
+
+            const F1 = 100, F2 = 150, L = 1.5;
+            // F1*d1 = F2*d2 => 100*d1 = 150*(1.5-d1) => 100*d1 = 225 - 150*d1 => 250*d1 = 225 => d1 = 0.9m
+            const d1_correct = 0.9;
+            const F_correct = F1 + F2; // Lực vai chịu = tổng 2 trọng lượng
+
+            if (Math.abs(d1_ans - d1_correct) < 0.01 && F_ans === F_correct) {
+                feedback.innerHTML = 'Chính xác! Vai phải đặt cách thùng gạo 0.9m (cách thùng nước 0.6m) và chịu một lực 250N.';
+                feedback.className = 'feedback correct';
+            } else {
+                feedback.innerHTML = 'Chưa đúng. Gợi ý: Áp dụng điều kiện cân bằng F₁d₁ = F₂d₂ và d₁ + d₂ = 1.5m.';
+                feedback.className = 'feedback incorrect';
+            }
+        };
+
+        // --- FOOTER & BACK-TO-TOP ---
+        const backToTopBtn = document.getElementById("back-to-top-btn");
+        if(backToTopBtn){ window.onscroll = function() { if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) { backToTopBtn.style.display = "block"; } else { backToTopBtn.style.display = "none"; } }; }
+        const yearSpan = document.getElementById('copyright-year');
+        if (yearSpan) { yearSpan.textContent = new Date().getFullYear(); }
+    });
+    </script>
+</body>
+</html>
