@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 16: Áp suất chất lỏng – Áp suất khí quyển</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <script>
+        window.lessonId = 'ap-suat-chat-long-khi-quyen';
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatWindow = document.getElementById('chat-window');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const AI_SERVICE_URL = 'https://ai-trung-tam-service.onrender.com';
+            const LESSON_ID = window.lessonId || 'default';
+            if(sendButton){
+                sendButton.addEventListener('click', askAI);
+                userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') askAI(); });
+            }
+            function addMessageToChat(text, className) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('chat-message', className);
+                chatWindow.appendChild(messageElement);
+                messageElement.innerHTML = marked.parse(text);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                return messageElement;
+            }
+            async function askAI() {
+                const question = userInput.value.trim();
+                if (!question) return;
+                addMessageToChat(question, 'user-message');
+                userInput.value = '';
+                const waitingMessage = addMessageToChat('Trợ lý AI đang suy nghĩ...', 'ai-message');
+                try {
+                    const response = await fetch(`${AI_SERVICE_URL}/ask`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ question: question, lesson_id: LESSON_ID })
+                    });
+                    if (!response.ok) throw new Error('Lỗi mạng hoặc server');
+                    const data = await response.json();
+                    waitingMessage.innerHTML = marked.parse(data.answer);
+                } catch (error) {
+                    waitingMessage.innerHTML = marked.parse('**Xin lỗi, đã có lỗi xảy ra!**');
+                }
+            }
+        });
+    </script>
+
+    <style>
+        :root {
+            --primary-color: #00796b; /* Xanh lá cây đậm */
+            --secondary-color: #fdd835; /* Vàng */
+            --bg-color: #e0f2f1;
+            --card-bg-color: #ffffff;
+            --text-color: #212121;
+            --correct-color: #4caf50;
+            --incorrect-color: #f44336;
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.7; background-color: var(--bg-color); color: var(--text-color); margin: 0; }
+        .container { max-width: 950px; margin: 0 auto; padding: 20px; }
+        header { background-color: var(--primary-color); color: white; padding: 1.5rem 1rem; text-align: center; margin-bottom: 0; position: relative; }
+        header h1 { margin: 0; font-size: 2.2em; }
+        .card { background-color: var(--card-bg-color); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); padding: 30px; margin-bottom: 30px; }
+        h2, h3, h4 { color: var(--primary-color); }
+        h2 { border-bottom: 3px solid var(--secondary-color); padding-bottom: 10px; margin-top: 0; }
+        button { background-color: var(--secondary-color); color: var(--text-color); border: none; padding: 10px 20px; font-size: 1em; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; }
+        button:hover { background-color: #fbc02d; }
+        input[type="number"] { padding: 8px; border-radius: 5px; border: 1px solid #ccc; margin: 0 5px; }
+        
+        .home-btn { position: absolute; top: 50%; left: 20px; transform: translateY(-50%); font-size: 28px; color: white; text-decoration: none; opacity: 0.8; transition: opacity 0.3s, transform 0.3s; }
+        .home-btn:hover { opacity: 1; transform: translateY(-50%) scale(1.1); }
+        
+        /* Thanh điều hướng */
+        .main-nav { background-color: #f1f1f1; padding: 10px; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .main-nav a { margin: 0 15px; text-decoration: none; color: var(--primary-color); font-weight: bold; }
+        .main-nav a:hover { color: var(--secondary-color); }
+
+        /* Mô phỏng */
+        .sim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; text-align: center; }
+        .sim-box { border: 1px solid #ddd; border-radius: 8px; padding: 15px; }
+        .sim-container { position: relative; height: 250px; background-color: #e3f2fd; margin: 15px auto; overflow: hidden; }
+        /* Sim 1 */
+        .beaker { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 150px; height: 150px; border: 3px solid #333; border-top: none; }
+        .water { position: absolute; bottom: 0; left: 0; width: 100%; height: 100px; background-color: #4fc3f7; }
+        #sim1-tube { position: absolute; width: 30px; height: 200px; border: 2px solid #333; background-color: #fff; border-bottom: none; left: 50%; transform: translateX(-50%); top: -200px; transition: top 2s; }
+        #sim1-tube.run { top: 20px; }
+        #sim1-water-level { position: absolute; bottom: 0; width: 100%; height: 10px; background-color: #4fc3f7; }
+        /* Sim 2 */
+        .sim2-wrapper { perspective: 800px; }
+        #sim2-glass { position: relative; width: 100px; height: 120px; border: 3px solid #333; background-color: #4fc3f7; margin: 40px auto; transform-origin: center; transition: transform 2s; }
+        #sim2-cardboard { position: absolute; bottom: -3px; left: -10px; width: 120px; height: 5px; background-color: #8d6e63; }
+        #sim2-glass.run { transform: rotateX(180deg); }
+
+        /* Luyện tập */
+        .feedback { margin-top: 10px; font-weight: bold; }
+        .feedback.correct { color: var(--correct-color); }
+        .feedback.incorrect { color: var(--incorrect-color); }
+        .solution { display: none; margin-top: 10px; background-color: #f9f9f9; border-left: 3px solid var(--primary-color); padding: 10px; }
+
+        /* Chatbot, Footer, Back-to-Top */
+        .chat-window { height: 300px; border: 1px solid #ccc; padding: 10px; overflow-y: auto; margin-bottom: 10px; }
+        .chat-message { margin-bottom: 10px; } .user-message { text-align: right; }
+        .ai-message { background-color: #f1f1f1; padding: 10px; border-radius: 8px; display: inline-block; max-width: 90%; text-align: left; }
+        .chat-input-area { display: flex; gap: 10px; } .chat-input-area input { flex-grow: 1; }
+        .site-footer { background-color: #333; color: #f1f1f1; padding: 30px 0; font-size: 0.9em; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .site-footer h4 { color: var(--secondary-color); } .site-footer ul { list-style-type: none; padding: 0; }
+        .site-footer a { color: #f1f1f1; text-decoration: none; } .site-footer a:hover { color: var(--secondary-color); }
+        #back-to-top-btn { display: none; position: fixed; bottom: 20px; right: 20px; z-index: 999; background-color: var(--secondary-color); color: var(--text-color); cursor: pointer; padding: 10px; border-radius: 50%; font-size: 18px; width: 50px; height: 50px; text-align: center; line-height: 30px; text-decoration: none; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: none;}
+        #back-to-top-btn:hover { background-color: var(--primary-color); color: white; }
+
+        @media (max-width: 600px) { .main-nav a { margin: 0 5px; font-size: 0.9em; } .sim-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body id="page-top">
+    <header>
+        <a href="/" class="home-btn" title="Về trang chủ">🏠</a>
+        <h1>Bài 16: ÁP SUẤT CHẤT LỎNG – ÁP SUẤT KHÍ QUYỂN</h1>
+    </header>
+
+    <nav class="main-nav">
+        <a href="#muc-tieu">Mục tiêu</a>
+        <a href="#kien-thuc">Kiến thức</a>
+        <a href="#thi-nghiem">Thí nghiệm</a>
+        <a href="#luyen-tap">Luyện tập</a>
+        <a href="#ung-dung">Ứng dụng</a>
+    </nav>
+
+    <div class="container">
+        <section id="muc-tieu" class="card">
+            <h2>🎯 Mục tiêu bài học</h2>
+            <ul>
+                <li>Nêu được áp suất chất lỏng phụ thuộc vào độ sâu và trọng lượng riêng của chất lỏng.</li>
+                <li>Mô tả được hiện tượng bình thông nhau và ứng dụng trong đời sống.</li>
+                <li>Nêu được khái niệm áp suất khí quyển và mô tả thí nghiệm chứng minh sự tồn tại của nó.</li>
+                <li>Giải thích được một số ứng dụng thực tế của áp suất khí quyển.</li>
+            </ul>
+        </section>
+
+        <section id="kien-thuc" class="card">
+            <h2>📚 Kiến thức trọng tâm</h2>
+            <h4>1. Áp suất chất lỏng</h4>
+            <p>Chất lỏng gây ra áp suất theo mọi phương lên đáy bình, thành bình và các vật ở trong lòng nó. Công thức tính áp suất chất lỏng tại một điểm ở độ sâu h là:</p>
+            <p style="text-align: center; font-weight: bold; font-size: 1.2em;"><code>p = d ⋅ h</code></p>
+            <ul>
+                <li><strong>p:</strong> áp suất (Pa)</li>
+                <li><strong>d:</strong> trọng lượng riêng của chất lỏng (N/m³)</li>
+                <li><strong>h:</strong> độ sâu của điểm cần tính so với mặt thoáng (m)</li>
+            </ul>
+            <h4>2. Bình thông nhau</h4>
+            <p>Trong bình thông nhau chứa cùng một chất lỏng đứng yên, các mặt thoáng của chất lỏng ở các nhánh khác nhau đều ở cùng một độ cao.</p>
+            <h4>3. Áp suất khí quyển</h4>
+            <p>Do Trái Đất được bao bọc bởi một lớp không khí dày nên nó gây ra một áp suất lên mọi vật trên bề mặt Trái Đất. Áp suất này gọi là áp suất khí quyển. Giá trị trung bình của áp suất khí quyển ở ngang mực nước biển là:</p>
+            <p style="text-align: center; font-weight: bold; font-size: 1.2em;"><code>p₀ ≈ 101325 Pa</code></p>
+        </section>
+
+        <section id="thi-nghiem" class="card">
+            <h2>🔬 Thí nghiệm mô phỏng</h2>
+            <div class="sim-grid">
+                <div class="sim-box">
+                    <h4>TN1: Áp suất chất lỏng</h4>
+                    <p>Quan sát mực nước trong ống nghiệm khi cắm vào cốc nước.</p>
+                    <div class="sim-container">
+                        <div class="beaker">
+                            <div class="water"></div>
+                        </div>
+                        <div id="sim1-tube">
+                            <div id="sim1-water-level"></div>
+                        </div>
+                    </div>
+                    <button id="start-sim-1">Bắt đầu</button>
+                </div>
+                <div class="sim-box">
+                    <h4>TN2: Áp suất khí quyển</h4>
+                    <p>Điều gì giữ cho tấm bìa không rơi khi úp ngược cốc nước?</p>
+                    <div class="sim-container sim2-wrapper">
+                        <div id="sim2-glass">
+                            <div id="sim2-cardboard"></div>
+                        </div>
+                    </div>
+                    <button id="start-sim-2">Bắt đầu</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="luyen-tap" class="card">
+            <h2>✍️ Câu hỏi trắc nghiệm</h2>
+            <div id="mcq-quiz">
+                <p><strong>Câu 1:</strong> Công thức tính áp suất chất lỏng là gì?</p>
+                <div><label><input type="radio" name="q1" value="a" data-correct="true"> p = d ⋅ h</label></div>
+                <div><label><input type="radio" name="q1" value="b"> p = F / S</label></div>
+                <div><label><input type="radio" name="q1" value="c"> p = d / h</label></div>
+                <div class="feedback" id="feedback-q1"></div>
+
+                <p><strong>Câu 2:</strong> Trong bình thông nhau chứa cùng một chất lỏng đứng yên, mặt thoáng chất lỏng ở các nhánh...</p>
+                <div><label><input type="radio" name="q2" value="a"> Nhánh to cao hơn nhánh nhỏ.</label></div>
+                <div><label><input type="radio" name="q2" value="b" data-correct="true"> Luôn ở cùng một độ cao.</label></div>
+                <div><label><input type="radio" name="q2" value="c"> Nhánh nhỏ cao hơn nhánh to.</label></div>
+                <div class="feedback" id="feedback-q2"></div>
+                
+                <p><strong>Câu 3:</strong> Hiện tượng úp cốc nước có tấm bìa không rơi xuống chứng minh điều gì?</p>
+                <div><label><input type="radio" name="q3" value="a"> Nước dính vào tấm bìa.</label></div>
+                <div><label><input type="radio" name="q3" value="b"> Trọng lực của nước rất nhỏ.</label></div>
+                <div><label><input type="radio" name="q3" value="c" data-correct="true"> Sự tồn tại của áp suất khí quyển.</label></div>
+                <div class="feedback" id="feedback-q3"></div>
+            </div>
+        </section>
+
+        <section id="ung-dung" class="card">
+            <h2>🔧 Bài tập vận dụng</h2>
+            <div class="exercise-item">
+                <h4>Bài 1 (Tính toán):</h4>
+                <p>Một tàu ngầm đang ở độ sâu 200m so với mặt nước biển. Tính áp suất của nước biển tác dụng lên tàu, biết trọng lượng riêng của nước biển là 10300 N/m³.</p>
+                <input type="number" id="calc-answer" placeholder="Nhập đáp án (Pa)">
+                <button onclick="checkCalculation()">Kiểm tra</button>
+                <div class="feedback" id="feedback-calc"></div>
+            </div>
+            <div class="exercise-item">
+                <h4>Bài 2 (Giải thích):</h4>
+                <p>Vì sao khi bơm xe đạp, ta thấy thân bơm bị nóng lên?</p>
+                <button onclick="toggleSolution('sol-2')">Xem giải thích</button>
+                <div class="solution" id="sol-2"><p>Khi ta ấn piston xuống, ta đã thực hiện công để nén không khí trong bơm. Một phần công này đã chuyển hóa thành nội năng, làm không khí và thân bơm nóng lên.</p></div>
+            </div>
+            <div class="exercise-item">
+                <h4>Bài 3 (Giải thích):</h4>
+                <p>Vì sao vòi nước phun ra từ các bể chứa nước ở trên cao (như trên nóc nhà cao tầng) lại mạnh?</p>
+                <button onclick="toggleSolution('sol-3')">Xem giải thích</button>
+                <div class="solution" id="sol-3"><p>Vì áp suất chất lỏng tỉ lệ thuận với độ sâu (p = d.h). Bể nước càng cao so với vòi thì cột nước (h) càng lớn, tạo ra áp suất càng mạnh, đẩy nước phun ra nhanh và xa hơn.</p></div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>💡 Góc "Em có thể"</h2>
+            <p>Hãy thử tìm thêm các ví dụ về ứng dụng của áp suất chất lỏng và áp suất khí quyển trong cuộc sống quanh em. Ví dụ: Tại sao ấm trà thường có một lỗ nhỏ trên nắp? Tại sao khi hút sữa trong hộp giấy, nếu hút hết không khí thì hộp sẽ bị bẹp lại?</p>
+        </section>
+        
+        <section id="ai-chatbot-card" class="card">
+            <h3>🤖 Trợ lý AI</h3>
+            <p>Bạn có thắc mắc gì về áp suất chất lỏng hoặc khí quyển không?</p>
+            <div id="chat-window" class="chat-window"></div>
+            <div class="chat-input-area">
+                <input type="text" id="user-input" placeholder="Ví dụ: Áp suất khí quyển là gì?">
+                <button id="send-button">Gửi</button>
+            </div>
+        </section>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div><h4>Nguồn tham khảo</h4><ul><li>Sách giáo khoa KHTN 8 - Bộ sách Kết nối tri thức.</li></ul></div>
+                <div><h4>Về trang web</h4><ul><li><a href="/">Về trang danh sách học liệu</a></li></ul></div>
+                <div><h4>Bản quyền & Liên hệ</h4><p>&copy; <span id="copyright-year"></span></p><p>Góp ý: <a href="mailto:gopy@example.com">gopy@example.com</a></p></div>
+            </div>
+        </div>
+    </footer>
+    <a href="#page-top" id="back-to-top-btn" title="Lên đầu trang">⬆️</a>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- MÔ PHỎNG ---
+        document.getElementById('start-sim-1').addEventListener('click', () => {
+            const tube = document.getElementById('sim1-tube');
+            tube.classList.remove('run');
+            void tube.offsetWidth; // Trick to restart animation
+            tube.classList.add('run');
+        });
+        document.getElementById('start-sim-2').addEventListener('click', () => {
+            const glass = document.getElementById('sim2-glass');
+            glass.classList.remove('run');
+            void glass.offsetWidth;
+            glass.classList.add('run');
+        });
+
+        // --- TRẮC NGHIỆM ---
+        document.querySelectorAll('#mcq-quiz input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const name = this.name;
+                const feedbackEl = document.getElementById('feedback-' + name);
+                if (this.dataset.correct) {
+                    feedbackEl.textContent = "Chính xác!";
+                    feedbackEl.className = 'feedback correct';
+                } else {
+                    feedbackEl.textContent = "Chưa đúng, hãy xem lại nhé.";
+                    feedbackEl.className = 'feedback incorrect';
+                }
+            });
+        });
+
+        // --- BÀI TẬP VẬN DỤNG ---
+        window.checkCalculation = function() {
+            const userAnswer = parseFloat(document.getElementById('calc-answer').value);
+            const feedbackEl = document.getElementById('feedback-calc');
+            const correctAnswer = 200 * 10300;
+            if (userAnswer === correctAnswer) {
+                feedbackEl.textContent = `Chính xác! p = d.h = 10300 * 200 = 2,060,000 (Pa).`;
+                feedbackEl.className = 'feedback correct';
+            } else {
+                feedbackEl.textContent = "Chưa đúng. Hãy áp dụng công thức p = d.h nhé!";
+                feedbackEl.className = 'feedback incorrect';
+            }
+        };
+        window.toggleSolution = function(solutionId) {
+            const sol = document.getElementById(solutionId);
+            sol.style.display = sol.style.display === 'block' ? 'none' : 'block';
+        };
+
+        // --- FOOTER & BACK-TO-TOP ---
+        const backToTopBtn = document.getElementById("back-to-top-btn");
+        if(backToTopBtn){ window.onscroll = function() { if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) { backToTopBtn.style.display = "block"; } else { backToTopBtn.style.display = "none"; } }; }
+        const yearSpan = document.getElementById('copyright-year');
+        if (yearSpan) { yearSpan.textContent = new Date().getFullYear(); }
+    });
+    </script>
+</body>
+</html>
