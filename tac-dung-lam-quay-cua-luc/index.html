@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 18: Tác dụng làm quay của lực. Moment lực</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <script>
+        window.lessonId = 'moment-luc';
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatWindow = document.getElementById('chat-window');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const AI_SERVICE_URL = 'https://ai-trung-tam-service.onrender.com';
+            const LESSON_ID = window.lessonId || 'default';
+            if(sendButton){
+                sendButton.addEventListener('click', askAI);
+                userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') askAI(); });
+            }
+            function addMessageToChat(text, className) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('chat-message', className);
+                chatWindow.appendChild(messageElement);
+                messageElement.innerHTML = marked.parse(text);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                return messageElement;
+            }
+            async function askAI() {
+                const question = userInput.value.trim();
+                if (!question) return;
+                addMessageToChat(question, 'user-message');
+                userInput.value = '';
+                const waitingMessage = addMessageToChat('Trợ lý AI đang suy nghĩ...', 'ai-message');
+                try {
+                    const response = await fetch(`${AI_SERVICE_URL}/ask`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ question: question, lesson_id: LESSON_ID })
+                    });
+                    if (!response.ok) throw new Error('Lỗi mạng hoặc server');
+                    const data = await response.json();
+                    waitingMessage.innerHTML = marked.parse(data.answer);
+                } catch (error) {
+                    waitingMessage.innerHTML = marked.parse('**Xin lỗi, đã có lỗi xảy ra!**');
+                }
+            }
+        });
+    </script>
+
+    <style>
+        :root {
+            --primary-color: #d84315; /* Cam cháy */
+            --secondary-color: #455a64; /* Xám xanh */
+            --bg-color: #fbe9e7;
+            --card-bg-color: #ffffff;
+            --text-color: #333;
+            --correct-color: #4caf50;
+            --incorrect-color: #f44336;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.7; background-color: var(--bg-color); color: var(--text-color); margin: 0; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background-color: var(--primary-color); color: white; padding: 1.5rem 1rem; text-align: center; margin-bottom: 30px; position: relative; }
+        header h1 { margin: 0; font-size: 2.2em; }
+        .card { background-color: var(--card-bg-color); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); padding: 30px; margin-bottom: 30px; }
+        h2, h3, h4 { color: var(--primary-color); }
+        h2 { border-bottom: 3px solid var(--secondary-color); padding-bottom: 10px; margin-top: 0; }
+        button { background-color: var(--secondary-color); color: white; border: none; padding: 12px 22px; font-size: 1em; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; }
+        button:hover { background-color: #37474f; }
+        input[type="number"] { padding: 8px; border-radius: 5px; border: 1px solid #ccc; margin: 0 5px; }
+        
+        .home-btn { position: absolute; top: 50%; left: 20px; transform: translateY(-50%); font-size: 28px; color: white; text-decoration: none; opacity: 0.8; transition: opacity 0.3s, transform 0.3s; }
+        .home-btn:hover { opacity: 1; transform: translateY(-50%) scale(1.1); }
+        
+        /* Phần I: PhET */
+        .phet-container { border: 2px solid var(--primary-color); border-radius: 8px; overflow: hidden; margin-top: 20px; }
+        .phet-container iframe { display: block; border: none; }
+
+        /* Phần II: Cánh tay đòn */
+        #wrench-svg { border: 1px solid #ccc; border-radius: 5px; width: 100%; max-width: 500px; display: block; margin: 15px auto; }
+        .lever-arm-option { cursor: pointer; transition: stroke-width 0.2s; }
+        .lever-arm-option:hover { stroke-width: 4; }
+        
+        /* Phần IV: Luyện tập */
+        .feedback { margin-top: 10px; font-weight: bold; padding: 10px; border-radius: 5px; }
+        .feedback.correct { color: #155724; background-color: #d4edda; }
+        .feedback.incorrect { color: #721c24; background-color: #f8d7da; }
+        .image-choices { display: flex; justify-content: space-around; gap: 15px; margin: 20px 0; }
+        .image-choice img { width: 100%; max-width: 150px; border: 3px solid transparent; border-radius: 8px; cursor: pointer; transition: border-color 0.3s; }
+        .image-choice.selected img { border-color: var(--secondary-color); }
+
+        /* CSS Chatbot, Footer, Back-to-Top */
+        .chat-window { height: 300px; border: 1px solid #ccc; padding: 10px; overflow-y: auto; margin-bottom: 10px; }
+        .chat-message { margin-bottom: 10px; } .user-message { text-align: right; }
+        .ai-message { background-color: #f1f1f1; padding: 10px; border-radius: 8px; display: inline-block; max-width: 90%; text-align: left; }
+        .chat-input-area { display: flex; gap: 10px; } .chat-input-area input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; }
+        .site-footer { background-color: #333; color: #f1f1f1; padding: 30px 0; font-size: 0.9em; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .site-footer h4 { color: var(--secondary-color); } .site-footer ul { list-style-type: none; padding: 0; }
+        .site-footer a { color: #f1f1f1; text-decoration: none; } .site-footer a:hover { color: var(--secondary-color); }
+        #back-to-top-btn { display: none; position: fixed; bottom: 20px; right: 20px; z-index: 999; background-color: var(--secondary-color); color: white; cursor: pointer; padding: 10px; border-radius: 50%; font-size: 18px; width: 50px; height: 50px; text-align: center; line-height: 30px; text-decoration: none; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: none;}
+        #back-to-top-btn:hover { background-color: var(--primary-color); }
+    </style>
+</head>
+<body id="page-top">
+    <header>
+        <a href="/" class="home-btn" title="Về trang chủ">🏠</a>
+        <h1>Bài 18: TÁC DỤNG LÀM QUAY CỦA LỰC. MOMENT LỰC</h1>
+    </header>
+
+    <div class="container">
+        <section id="phan1" class="card">
+            <h2>Phần I: Thí nghiệm ảo Moment lực với PhET</h2>
+            <p>Sử dụng mô phỏng PhET dưới đây để tìm hiểu về moment lực. Hãy thử thay đổi độ lớn của lực tác dụng và khoảng cách từ điểm đặt của lực đến trục quay để xem tác dụng làm quay thay đổi như thế nào.</p>
+            <div class="phet-container">
+                <iframe src="https://phet.colorado.edu/sims/html/torque/latest/torque_vi.html" width="100%" height="500px" allowfullscreen></iframe>
+            </div>
+        </section>
+
+        <section id="phan2" class="card">
+            <h2>Phần II: Tương tác "Xác định Cánh tay đòn"</h2>
+            <p>Quan sát hình vẽ cờ-lê vặn ốc dưới đây. Lực <strong>F</strong> đang tác dụng lên cờ-lê. Theo em, đâu là cánh tay đòn (d) của lực <strong>F</strong>? Hãy bấm vào đoạn thẳng mà em cho là đúng.</p>
+            <svg id="wrench-svg" viewBox="0 0 500 250">
+                <text x="10" y="20">Trục quay (Tâm ốc)</text>
+                <text x="350" y="55">Lực F</text>
+                
+                <path d="M 100 120 C 110 90, 130 90, 140 120 L 350 140 L 350 160 L 140 180 C 130 210, 110 210, 100 180 Z" fill="#c0c0c0" stroke="#555" stroke-width="2"/>
+                <circle cx="100" cy="150" r="20" fill="none" stroke="#555" stroke-width="2"/>
+                <circle cx="100" cy="150" r="5" fill="#555"/>
+
+                <line x1="350" y1="70" x2="350" y2="140" stroke="red" stroke-width="3" marker-end="url(#arrowhead)"/>
+                <defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="red"/></marker></defs>
+                <line x1="100" y1="150" x2="400" y2="30" stroke="grey" stroke-dasharray="4" id="force-line"/>
+                
+                <line id="incorrect-arm" class="lever-arm-option" x1="100" y1="150" x2="350" y2="150" stroke="blue" stroke-width="3" stroke-dasharray="5,5"/>
+                <line id="correct-arm" class="lever-arm-option" x1="100" y1="150" x2="100" y2="30" stroke="blue" stroke-width="3"/>
+                <text x="220" y="170" fill="blue">Đoạn (a)</text>
+                <text x="105" y="90" fill="blue">Đoạn (b)</text>
+            </svg>
+            <div id="feedback-lever-arm" class="feedback"></div>
+        </section>
+
+        <section id="phan3" class="card">
+            <h2>Phần III: Kiến thức cốt lõi cần nhớ</h2>
+            <ul>
+                <li>Tác dụng làm quay của lực lên một vật quanh một điểm hoặc một trục được đặc trưng bằng <strong>moment lực</strong>.</li>
+                <li>Moment lực phụ thuộc vào hai yếu tố:
+                    <ol>
+                        <li>Độ lớn của lực (F).</li>
+                        <li><strong>Cánh tay đòn (d)</strong>.</li>
+                    </ol>
+                </li>
+                <li><strong>Cánh tay đòn (d)</strong> là khoảng cách từ trục quay đến <strong>giá của lực</strong> (đường thẳng chứa vector lực).</li>
+                <li><strong>Công thức tính moment lực:</strong> <code>M = F ⋅ d</code>
+                    <ul>
+                        <li><strong>M:</strong> Moment lực (N.m)</li>
+                        <li><strong>F:</strong> Độ lớn của lực (N)</li>
+                        <li><strong>d:</strong> Cánh tay đòn (m)</li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section id="ai-chatbot-card" class="card">
+            <h3>🤖 Trợ lý AI</h3>
+            <p>Bạn có thắc mắc gì về Moment lực hay Cánh tay đòn không?</p>
+            <div id="chat-window" class="chat-window"></div>
+            <div class="chat-input-area">
+                <input type="text" id="user-input" placeholder="Ví dụ: Giá của lực là gì?">
+                <button id="send-button">Gửi</button>
+            </div>
+        </section>
+
+        <section id="phan4" class="card">
+            <h2>Phần IV: Luyện tập và Vận dụng</h2>
+            <div class="exercise-item">
+                <h4>Bài 1 (Trắc nghiệm):</h4>
+                <p>Để mở một cánh cửa gỗ bị kẹt, cách nào sau đây hiệu quả nhất?</p>
+                <div id="feedback-ex1"></div>
+                <div><label><input type="radio" name="ex1" value="a"> Đẩy một lực rất mạnh vào điểm gần bản lề.</label></div>
+                <div><label><input type="radio" name="ex1" value="b"> Đẩy một lực vừa phải vào điểm xa bản lề.</label></div>
+                <div><label><input type="radio" name="ex1" value="c" data-correct="true"> Đẩy một lực rất mạnh vào điểm xa bản lề nhất có thể.</label></div>
+            </div>
+            <div class="exercise-item">
+                <h4>Bài 2 (Tính toán):</h4>
+                <p>Một người tác dụng lực 80 N vuông góc với một chiếc cờ-lê. Khoảng cách từ điểm tác dụng lực đến tâm ốc vít (trục quay) là 25 cm. Tính moment lực do người đó tạo ra.</p>
+                <input type="number" id="ex2-answer" placeholder="Đáp án (N.m)">
+                <button onclick="checkCalc()">Kiểm tra</button>
+                <div id="feedback-ex2" class="feedback"></div>
+            </div>
+             <div class="exercise-item">
+                <h4>Bài 3 (Nhận biết):</h4>
+                <p>Trong 3 trường hợp tác dụng lực vào cánh cửa dưới đây, trường hợp nào lực tác dụng **không** gây ra moment lực?</p>
+                <div class="image-choices" id="image-choices-ex3">
+                    <div class="image-choice" data-id="1"><img src="https://placehold.co/150x200/EFEFEF/333?text=A.+Đẩy+vuông+góc" alt="Đẩy vuông góc"></div>
+                    <div class="image-choice" data-id="2" data-correct="true"><img src="https://placehold.co/150x200/EFEFEF/333?text=B.+Đẩy+thẳng+vào+bản+lề" alt="Đẩy vào bản lề"></div>
+                    <div class="image-choice" data-id="3"><img src="https://placehold.co/150x200/EFEFEF/333?text=C.+Đẩy+xiên+góc" alt="Đẩy xiên góc"></div>
+                </div>
+                <button onclick="checkImageChoice()">Kiểm tra</button>
+                <div id="feedback-ex3" class="feedback"></div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div><h4>Nguồn tham khảo</h4><ul><li>Sách giáo khoa KHTN 8 - Bộ sách Kết nối tri thức.</li><li>PhET Interactive Simulations.</li></ul></div>
+                <div><h4>Về trang web</h4><ul><li><a href="/">Về trang danh sách học liệu</a></li></ul></div>
+                <div><h4>Bản quyền & Liên hệ</h4><p>&copy; <span id="copyright-year"></span>-nungvanhien</p><p>Góp ý: <a href="mailto:gopy@example.com">vanhien1199@gmail.com</a></p></div>
+            </div>
+        </div>
+    </footer>
+    <a href="#page-top" id="back-to-top-btn" title="Lên đầu trang">⬆️</a>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- PHẦN II: CÁNH TAY ĐÒN ---
+        const correctArm = document.getElementById('correct-arm');
+        const incorrectArm = document.getElementById('incorrect-arm');
+        const feedbackLever = document.getElementById('feedback-lever-arm');
+
+        correctArm.addEventListener('click', () => {
+            feedbackLever.innerHTML = "<strong>Chính xác!</strong> Cánh tay đòn (b) là khoảng cách từ trục quay đến giá của lực (đường thẳng chứa vector lực F).";
+            feedbackLever.className = 'feedback correct';
+            correctArm.style.stroke = 'var(--correct-color)';
+            incorrectArm.style.stroke = 'blue';
+        });
+        incorrectArm.addEventListener('click', () => {
+            feedbackLever.innerHTML = "<strong>Chưa đúng.</strong> Đoạn (a) chỉ là khoảng cách từ trục quay đến điểm đặt của lực. Cánh tay đòn phải là khoảng cách vuông góc từ trục quay đến giá của lực.";
+            feedbackLever.className = 'feedback incorrect';
+            incorrectArm.style.stroke = 'var(--incorrect-color)';
+            correctArm.style.stroke = 'blue';
+        });
+        
+        // --- PHẦN IV: LUYỆN TẬP ---
+        // Bài 1
+        document.querySelectorAll('input[name="ex1"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const feedbackEl = document.getElementById('feedback-ex1');
+                if (this.dataset.correct) {
+                    feedbackEl.innerHTML = "<strong>Đúng!</strong> Để tạo moment lực lớn nhất, cần tác dụng lực lớn nhất (đẩy mạnh) và có cánh tay đòn dài nhất (xa bản lề).";
+                    feedbackEl.className = 'feedback correct';
+                } else {
+                    feedbackEl.innerHTML = "<strong>Chưa hiệu quả nhất.</strong> Hãy nghĩ xem yếu tố nào làm tăng moment lực nhé.";
+                    feedbackEl.className = 'feedback incorrect';
+                }
+            });
+        });
+        
+        // Bài 2
+        window.checkCalc = function() {
+            const userAnswer = parseFloat(document.getElementById('ex2-answer').value);
+            const feedbackEl = document.getElementById('feedback-ex2');
+            const d_m = 25 / 100; // Đổi cm sang m
+            const correctAnswer = 80 * d_m;
+            if (userAnswer === correctAnswer) {
+                feedbackEl.innerHTML = `<strong>Chính xác!</strong> M = F ⋅ d = 80 N ⋅ 0.25 m = 20 N.m.`;
+                feedbackEl.className = 'feedback correct';
+            } else {
+                feedbackEl.innerHTML = "<strong>Chưa đúng.</strong> Bạn có quên đổi đơn vị từ cm sang m không? (25 cm = 0.25 m)";
+                feedbackEl.className = 'feedback incorrect';
+            }
+        };
+
+        // Bài 3
+        const imageChoices = document.querySelectorAll('.image-choice');
+        let selectedImage = null;
+        imageChoices.forEach(choice => {
+            choice.addEventListener('click', () => {
+                imageChoices.forEach(c => c.classList.remove('selected'));
+                choice.classList.add('selected');
+                selectedImage = choice;
+            });
+        });
+        window.checkImageChoice = function() {
+            const feedbackEl = document.getElementById('feedback-ex3');
+            if (!selectedImage) {
+                feedbackEl.innerHTML = "Bạn chưa chọn hình nào.";
+                feedbackEl.className = 'feedback incorrect';
+                return;
+            }
+            if (selectedImage.dataset.correct) {
+                feedbackEl.innerHTML = "<strong>Đúng!</strong> Ở trường hợp B, giá của lực đi qua trục quay (bản lề) nên cánh tay đòn d = 0, do đó không tạo ra moment lực.";
+                feedbackEl.className = 'feedback correct';
+            } else {
+                feedbackEl.innerHTML = "<strong>Chưa đúng.</strong> Lực không gây ra moment làm quay khi giá của nó đi qua trục quay.";
+                feedbackEl.className = 'feedback incorrect';
+            }
+        };
+
+        // --- FOOTER & BACK-TO-TOP ---
+        const backToTopBtn = document.getElementById("back-to-top-btn");
+        if(backToTopBtn){ window.onscroll = function() { if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) { backToTopBtn.style.display = "block"; } else { backToTopBtn.style.display = "none"; } }; }
+        const yearSpan = document.getElementById('copyright-year');
+        if (yearSpan) { yearSpan.textContent = new Date().getFullYear(); }
+    });
+    </script>
+</body>
+</html>
