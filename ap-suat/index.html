@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài 15: Áp suất trên một bề mặt</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <script>
+        window.lessonId = 'ap-suat';
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatWindow = document.getElementById('chat-window');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const AI_SERVICE_URL = 'https://ai-trung-tam-service.onrender.com';
+            const LESSON_ID = window.lessonId || 'default';
+
+            if(sendButton){
+                sendButton.addEventListener('click', askAI);
+                userInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') askAI(); });
+            }
+
+            function addMessageToChat(text, className) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('chat-message', className);
+                chatWindow.appendChild(messageElement);
+                messageElement.innerHTML = marked.parse(text);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                return messageElement;
+            }
+
+            async function askAI() {
+                const question = userInput.value.trim();
+                if (!question) return;
+                addMessageToChat(question, 'user-message');
+                userInput.value = '';
+                const waitingMessage = addMessageToChat('Trợ lý AI đang suy nghĩ...', 'ai-message');
+                try {
+                    const response = await fetch(`${AI_SERVICE_URL}/ask`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ question: question, lesson_id: LESSON_ID })
+                    });
+                    if (!response.ok) throw new Error('Lỗi mạng hoặc server');
+                    const data = await response.json();
+                    waitingMessage.innerHTML = marked.parse(data.answer);
+                } catch (error) {
+                    waitingMessage.innerHTML = marked.parse('**Xin lỗi, đã có lỗi xảy ra!**');
+                }
+            }
+        });
+    </script>
+
+    <style>
+        :root {
+            --primary-color: #bf360c; /* Cam đậm */
+            --secondary-color: #01579b; /* Xanh dương đậm */
+            --bg-color: #fbe9e7;
+            --card-bg-color: #ffffff;
+            --text-color: #333;
+            --correct-color: #4caf50;
+            --incorrect-color: #f44336;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.7; background-color: var(--bg-color); color: var(--text-color); margin: 0; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        header { background-color: var(--primary-color); color: white; padding: 1.5rem 1rem; text-align: center; margin-bottom: 30px; position: relative; }
+        header h1 { margin: 0; font-size: 2.5em; }
+        .card { background-color: var(--card-bg-color); border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); padding: 30px; margin-bottom: 30px; }
+        h2, h3, h4 { color: var(--primary-color); }
+        h2 { border-bottom: 3px solid var(--secondary-color); padding-bottom: 10px; margin-top: 0; }
+        button { background-color: var(--secondary-color); color: white; border: none; padding: 12px 22px; font-size: 1em; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; }
+        button:hover { background-color: #0277bd; }
+        input[type="number"] { padding: 8px; border-radius: 5px; border: 1px solid #ccc; margin: 0 5px; }
+        
+        .home-btn { position: absolute; top: 50%; left: 20px; transform: translateY(-50%); font-size: 28px; color: white; text-decoration: none; opacity: 0.8; transition: opacity 0.3s, transform 0.3s; }
+        .home-btn:hover { opacity: 1; transform: translateY(-50%) scale(1.1); }
+        
+        /* Phần I: Mô phỏng Áp suất */
+        .pressure-sim-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .sim-display { position: relative; height: 300px; background-color: #fff8e1; border-radius: 5px; border: 1px solid #ddd; }
+        .sand-surface { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background-color: #ffe0b2; }
+        #sim-box { position: absolute; background-color: #a1887f; border: 2px solid #5d4037; transition: bottom 0.5s ease, width 0.3s ease, height 0.3s ease; }
+        .sim-controls button.active { background-color: var(--primary-color); color: white; }
+        .sim-data { background-color: #f1f1f1; padding: 15px; border-radius: 5px; margin-top: 15px; }
+        .sim-data p { margin: 5px 0; font-weight: bold; }
+
+        /* Phần II: Kéo-Thả */
+        .dnd-layout { display: flex; gap: 20px; justify-content: space-between; }
+        .dnd-source, .dnd-target { border: 2px dashed #ccc; padding: 15px; border-radius: 8px; width: 48%; }
+        .dnd-source h4 { margin-top: 0; }
+        .dnd-target h4 { margin-top: 0; text-align: center; }
+        .draggable-item { background-color: #e0e0e0; padding: 8px 12px; margin: 8px 0; border-radius: 5px; cursor: grab; }
+        .dnd-target.over { background-color: #e8f5e9; }
+        .dnd-target#increase-pressure { border-color: var(--incorrect-color); }
+        .dnd-target#decrease-pressure { border-color: var(--correct-color); }
+
+        /* Phần IV: Luyện tập */
+        .feedback { margin-top: 10px; font-weight: bold; }
+        .feedback.correct { color: var(--correct-color); }
+        .feedback.incorrect { color: var(--incorrect-color); }
+
+        /* CSS Chatbot, Footer, Back-to-Top */
+        .chat-window { height: 300px; border: 1px solid #ccc; padding: 10px; overflow-y: auto; margin-bottom: 10px; border-radius: 5px; }
+        .chat-message { margin-bottom: 10px; } .user-message { text-align: right; }
+        .ai-message { background-color: #f1f1f1; padding: 10px; border-radius: 8px; display: inline-block; max-width: 90%; text-align: left; }
+        .chat-input-area { display: flex; gap: 10px; } .chat-input-area input { flex-grow: 1; }
+        .site-footer { background-color: #333; color: #f1f1f1; padding: 30px 0; font-size: 0.9em; }
+        .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .site-footer h4 { color: var(--secondary-color); } .site-footer ul { list-style-type: none; padding: 0; }
+        .site-footer a { color: #f1f1f1; text-decoration: none; } .site-footer a:hover { color: var(--secondary-color); }
+        #back-to-top-btn { display: none; position: fixed; bottom: 20px; right: 20px; z-index: 99; background-color: var(--secondary-color); color: white; cursor: pointer; padding: 10px; border-radius: 50%; font-size: 18px; width: 50px; height: 50px; text-align: center; line-height: 30px; text-decoration: none; box-shadow: 0 4px 8px rgba(0,0,0,0.2); border: none;}
+        #back-to-top-btn:hover { background-color: var(--primary-color); }
+        
+        @media (max-width: 768px) { .pressure-sim-layout, .dnd-layout { grid-template-columns: 1fr; flex-direction: column; } }
+    </style>
+</head>
+<body id="page-top">
+    <header>
+        <a href="/" class="home-btn" title="Về trang chủ">🏠</a>
+        <h1>Bài 15: ÁP SUẤT TRÊN MỘT BỀ MẶT</h1>
+    </header>
+
+    <div class="container">
+        <section id="phan1" class="card">
+            <h2>Phần I: Mô phỏng tương tác "Thí nghiệm Áp suất"</h2>
+            <div class="pressure-sim-layout">
+                <div class="sim-display">
+                    <div class="sand-surface"></div>
+                    <div id="sim-box"></div>
+                </div>
+                <div class="sim-controls">
+                    <h4>Bảng điều khiển</h4>
+                    <p><strong>1. Thay đổi Áp lực (F):</strong></p>
+                    <div id="force-controls">
+                        <button data-force="10" class="active">1 Khối (10 N)</button>
+                        <button data-force="20">2 Khối (20 N)</button>
+                        <button data-force="30">3 Khối (30 N)</button>
+                    </div>
+                    <p><strong>2. Thay đổi Diện tích bị ép (S):</strong></p>
+                    <div id="area-controls">
+                        <button data-area="0.1" data-w="150" data-h="50">Nằm ngang (0.1 m²)</button>
+                        <button data-area="0.05" data-w="100" data-h="75">Nằm nghiêng</button>
+                        <button data-area="0.02" data-w="50" data-h="100" class="active">Đứng thẳng (0.02 m²)</button>
+                    </div>
+                    <div class="sim-data">
+                        <h4>Số liệu thời gian thực:</h4>
+                        <p>Áp lực F: <span id="display-f"></span> N</p>
+                        <p>Diện tích S: <span id="display-s"></span> m²</p>
+                        <p>Áp suất p: <span id="display-p"></span> Pa</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="phan2" class="card">
+            <h2>Phần II: Ứng dụng thực tế (Kéo-Thả)</h2>
+            <p>Hãy kéo các vật dụng sau vào đúng cột để xem chúng là ứng dụng làm tăng hay giảm áp suất.</p>
+            <div class="dnd-layout">
+                <div class="dnd-source">
+                    <h4>Vật dụng</h4>
+                    <div class="draggable-item" draggable="true" data-target="increase">Lưỡi dao</div>
+                    <div class="draggable-item" draggable="true" data-target="decrease">Móng nhà</div>
+                    <div class="draggable-item" draggable="true" data-target="increase">Đầu đinh</div>
+                    <div class="draggable-item" draggable="true" data-target="decrease">Bánh xe tăng</div>
+                    <div class="draggable-item" draggable="true" data-target="decrease">Ván trượt tuyết</div>
+                </div>
+                <div class="dnd-target" id="increase-pressure"><h4>Làm TĂNG áp suất</h4></div>
+                <div class="dnd-target" id="decrease-pressure"><h4>Làm GIẢM áp suất</h4></div>
+            </div>
+        </section>
+        
+        <section id="phan3" class="card">
+            <h2>Phần III: Kiến thức cốt lõi cần nhớ</h2>
+            <ul>
+                <li><strong>Áp lực</strong> là lực ép có phương vuông góc với mặt bị ép.</li>
+                <li><strong>Áp suất (p)</strong> là độ lớn của áp lực trên một đơn vị diện tích bị ép.</li>
+                <li><strong>Công thức tính áp suất:</strong> p = F/S
+                    <ul>
+                        <li><strong>p:</strong> áp suất, đơn vị Pascal (Pa). 1 Pa = 1 N/m².</li>
+                        <li><strong>F:</strong> áp lực, đơn vị Newton (N).</li>
+                        <li><strong>S:</strong> diện tích bị ép, đơn vị mét vuông (m²).</li>
+                    </ul>
+                </li>
+                <li>Để <strong>tăng áp suất</strong>, ta có thể: <strong>Tăng áp lực (F)</strong> hoặc <strong>Giảm diện tích bị ép (S)</strong>.</li>
+                <li>Để <strong>giảm áp suất</strong>, ta có thể: <strong>Giảm áp lực (F)</strong> hoặc <strong>Tăng diện tích bị ép (S)</strong>.</li>
+            </ul>
+        </section>
+
+        <section id="ai-chatbot-card" class="card">
+            <h3>🤖 Trợ lý AI</h3>
+            <p>Bạn có thắc mắc gì về áp suất không? Hãy hỏi tôi nhé!</p>
+            <div id="chat-window" class="chat-window">
+                <div class="chat-message ai-message">Chào bạn! Hãy đặt câu hỏi về bài học này.</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="user-input" placeholder="Ví dụ: Tại sao xe tăng dùng xích?">
+                <button id="send-button">Gửi</button>
+            </div>
+        </section>
+
+        <section id="phan4" class="card">
+            <h2>Phần IV: Luyện tập</h2>
+            <h4>1. Bài tập tính toán</h4>
+            <p>Một chiếc tủ có trọng lượng 1200 N, diện tích mặt đáy tiếp xúc với sàn là 0.5 m². Tính áp suất của tủ tác dụng lên sàn nhà.</p>
+            <div>
+                <input type="number" id="calc-answer" placeholder="Nhập đáp án (Pa)">
+                <button onclick="checkPressureCalc()">Kiểm tra</button>
+            </div>
+            <div id="feedback-calc" class="feedback"></div>
+
+            <hr style="margin: 30px 0;">
+            <h4>2. Bài tập trắc nghiệm</h4>
+            <p>Tại sao mũi kim, mũi đinh lại được làm rất nhọn?</p>
+            <div id="feedback-mcq" class="feedback"></div>
+            <div><label><input type="radio" name="q-mcq" value="a"> Để tăng áp lực tác dụng.</label></div>
+            <div><label><input type="radio" name="q-mcq" value="b" data-correct="true"> Để giảm diện tích bị ép, từ đó tăng áp suất.</label></div>
+            <div><label><input type="radio" name="q-mcq" value="c"> Để vật liệu được bền hơn.</label></div>
+        </section>
+    </div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div><h4>Nguồn tham khảo</h4><ul><li>Sách giáo khoa KHTN 8 - Bộ sách Kết nối tri thức.</li></ul></div>
+                <div><h4>Về trang web</h4><ul><li><a href="/">Về trang danh sách học liệu</a></li></ul></div>
+                <div><h4>Bản quyền & Liên hệ</h4><p>&copy; <span id="copyright-year"></span> - Tên tác giả/Trường học</p><p>Góp ý: <a href="mailto:gopy@example.com">gopy@example.com</a></p></div>
+            </div>
+        </div>
+    </footer>
+    <a href="#page-top" id="back-to-top-btn" title="Lên đầu trang">⬆️</a>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- PHẦN I: MÔ PHỎNG ÁP SUẤT ---
+        const simBox = document.getElementById('sim-box');
+        const displayF = document.getElementById('display-f');
+        const displayS = document.getElementById('display-s');
+        const displayP = document.getElementById('display-p');
+        const forceControls = document.getElementById('force-controls');
+        const areaControls = document.getElementById('area-controls');
+        
+        let simState = { force: 10, area: 0.02, width: 50, height: 100 };
+
+        function updateSimulation() {
+            const pressure = simState.force / simState.area;
+            const sinkDepth = Math.min(pressure * 0.2, 100); // Tỉ lệ lún và giới hạn lún
+
+            // Cập nhật hiển thị số liệu
+            displayF.textContent = simState.force;
+            displayS.textContent = simState.area;
+            displayP.textContent = pressure.toFixed(0);
+            
+            // Cập nhật hình ảnh mô phỏng
+            simBox.style.width = `${simState.width}px`;
+            simBox.style.height = `${simState.height}px`;
+            simBox.style.left = `calc(50% - ${simState.width/2}px)`;
+            simBox.style.bottom = `${150 - sinkDepth}px`; // 150 là chiều cao lớp cát
+        }
+
+        forceControls.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') {
+                simState.force = parseFloat(e.target.dataset.force);
+                forceControls.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                updateSimulation();
+            }
+        });
+        areaControls.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') {
+                simState.area = parseFloat(e.target.dataset.area);
+                simState.width = parseFloat(e.target.dataset.w);
+                simState.height = parseFloat(e.target.dataset.h);
+                areaControls.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                updateSimulation();
+            }
+        });
+        updateSimulation(); // Chạy lần đầu
+
+        // --- PHẦN II: KÉO-THẢ ---
+        const draggables = document.querySelectorAll('.draggable-item');
+        const dropTargets = document.querySelectorAll('.dnd-target');
+        draggables.forEach(item => {
+            item.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', e.target.dataset.target); });
+        });
+        dropTargets.forEach(zone => {
+            zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+            zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+            zone.addEventListener('drop', e => {
+                e.preventDefault();
+                zone.classList.remove('over');
+                const targetType = e.dataTransfer.getData('text/plain');
+                if (zone.id.includes(targetType)) {
+                    const droppedItem = document.querySelector(`.draggable-item[data-target="${targetType}"]`);
+                    zone.appendChild(droppedItem);
+                }
+            });
+        });
+
+        // --- PHẦN IV: LUYỆN TẬP ---
+        window.checkPressureCalc = function() {
+            const userAnswer = parseFloat(document.getElementById('calc-answer').value);
+            const feedbackEl = document.getElementById('feedback-calc');
+            const correctAnswer = 1200 / 0.5;
+            if (userAnswer === correctAnswer) {
+                feedbackEl.textContent = `Chính xác! p = F/S = 1200 / 0.5 = 2400 (Pa).`;
+                feedbackEl.className = 'feedback correct';
+            } else {
+                feedbackEl.textContent = "Chưa đúng, hãy tính lại nhé!";
+                feedbackEl.className = 'feedback incorrect';
+            }
+        };
+
+        const mcqRadios = document.querySelectorAll('input[name="q-mcq"]');
+        mcqRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                const feedbackEl = document.getElementById('feedback-mcq');
+                if (this.dataset.correct) {
+                    feedbackEl.textContent = "Đúng rồi! Mũi đinh nhọn để giảm diện tích, tăng áp suất.";
+                    feedbackEl.className = 'feedback correct';
+                } else {
+                    feedbackEl.textContent = "Chưa chính xác. Hãy nghĩ xem việc làm nhọn sẽ ảnh hưởng đến F hay S?";
+                    feedbackEl.className = 'feedback incorrect';
+                }
+            });
+        });
+
+        // --- FOOTER & BACK-TO-TOP ---
+        const backToTopBtn = document.getElementById("back-to-top-btn");
+        if(backToTopBtn){ window.onscroll = function() { if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) { backToTopBtn.style.display = "block"; } else { backToTopBtn.style.display = "none"; } }; }
+        const yearSpan = document.getElementById('copyright-year');
+        if (yearSpan) { yearSpan.textContent = new Date().getFullYear(); }
+    });
+    </script>
+</body>
+</html>
